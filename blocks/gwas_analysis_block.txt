@@ -1,0 +1,144 @@
+Prompt: <PROMPT>
+
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive GWAS (Genome-Wide Association Study) analysis section for a precision medicine report.
+
+**THIS GWAS ANALYSIS MUST SPECIFICALLY FOCUS ON**: <PROMPT>
+
+Analyze GWAS associations with PRIMARY EMPHASIS on how they relate to: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Detailed Protein Mutations: <PROTEIN_MUTATIONS>
+Combined Protein-Disease-Mutations Analysis: <PROTEIN_DISEASE_MUTATIONS>
+Family History: <FAMILY_HISTORY>
+GWAS Associations: <GWAS_ASSOCIATIONS>
+
+CRITICAL FOCUS: Analyze the GWAS associations in the context of the identified protein mutations and their relevance to the report focus. Connect GWAS findings to the specific proteins and diseases identified in this patient.
+
+PROGRESSIVE BUILDING: This section builds upon all previous sections. Reference the specific protein mutations, risk assessments, and clinical implications already established. Do NOT repeat information - instead, provide population-level validation and additional insights.
+
+RELEVANCE FILTERING: Only include GWAS associations that are directly relevant to the report focus condition. Filter out tangentially related or irrelevant associations (cancer, lipids, metabolites, autoimmune conditions). Prioritize associations that validate or complement the protein mutation findings.
+
+PROTEIN-GWAS INTEGRATION: Explicitly connect GWAS findings to the specific protein mutations identified in this patient. Show how population-level data supports or modifies individual genetic findings.
+
+CONTENT REQUIREMENTS: This section MUST contain substantive GWAS analysis. If limited relevant GWAS data is available, focus on the most clinically relevant associations and explain their potential relevance to the condition. Never generate empty or minimal content.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a detailed GWAS analysis that includes:
+
+1. Overview of GWAS relevance to the patient's profile:
+   - How GWAS data complements protein mutation findings
+   - Population-level evidence supporting individual genetic findings
+   - Validation of protein-disease associations through GWAS
+
+2. Notable GWAS associations analysis:
+   - Disease/trait associations relevant to the report focus
+   - SNPs and genes that overlap with patient's mutations
+   - P-values and effect sizes for notable associations
+   - Population frequencies and clinical relevance
+
+3. Integration with protein mutation data:
+   - GWAS associations that validate protein-disease findings
+   - Additional disease risks identified through GWAS
+   - Polygenic risk score implications if applicable
+   - Pathway-level validation through GWAS
+
+4. Clinical implications of GWAS findings:
+   - How GWAS data modifies risk assessment
+   - Additional screening recommendations based on GWAS
+   - Treatment considerations informed by GWAS
+   - Family risk assessment enhanced by GWAS data
+
+Requirements:
+- PRIORITIZE GWAS associations directly relevant to the report focus
+- Connect GWAS findings to the specific proteins mutated in this patient
+- Explain how GWAS data validates or modifies protein-based risk assessment
+- Include population context for genetic findings
+- Focus on clinically actionable GWAS associations
+- DO NOT HALLUCINATE - only include validated GWAS associations from the data
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "gwas_analysis": {
+    "overview": "[Comprehensive explanation of how GWAS data relates to this patient's genetic profile and the report focus]",
+    "methodology": {
+      "data_sources": ["[Database 1]", "[Database 2]"],
+      "significance_threshold": "[P-value threshold used]",
+      "population_context": "[Population studied and relevance to patient]"
+    },
+    "notable_associations": [
+      {
+        "disease_trait": "[Disease or trait name]",
+        "snp": "[SNP identifier]",
+        "gene": "[Associated gene]",
+        "p_value": "[P-value]",
+        "effect_size": "[Effect size if available]",
+        "clinical_relevance": "[How this relates to the patient and report focus]",
+        "protein_connection": "[Connection to patient's mutated proteins if any]",
+        "population_frequency": "[Allele frequency in population]"
+      }
+    ],
+    "protein_gwas_integration": {
+      "validated_associations": [
+        {
+          "protein": "[Protein name]",
+          "gwas_support": "[How GWAS data supports protein-disease association]",
+          "additional_evidence": "[Additional diseases/traits from GWAS]",
+          "confidence_level": "[High/Medium/Low based on GWAS validation]"
+        }
+      ],
+      "novel_associations": [
+        {
+          "disease_trait": "[Disease/trait identified through GWAS but not protein analysis]",
+          "clinical_significance": "[Relevance to patient care]",
+          "recommendation": "[Clinical action based on this finding]"
+        }
+      ]
+    },
+    "risk_assessment_modification": {
+      "gwas_enhanced_risks": [
+        {
+          "disease": "[Disease name]",
+          "protein_risk": "[Risk level from protein analysis]",
+          "gwas_risk": "[Risk level from GWAS]",
+          "combined_assessment": "[Integrated risk assessment]",
+          "confidence": "[Confidence in combined assessment]"
+        }
+      ],
+      "polygenic_considerations": "[How multiple GWAS associations contribute to overall risk]"
+    },
+    "clinical_implications": {
+      "screening_modifications": [
+        {
+          "recommendation": "[Screening recommendation]",
+          "gwas_justification": "[How GWAS data supports this recommendation]",
+          "priority": "[High/Medium/Low]"
+        }
+      ],
+      "treatment_considerations": [
+        {
+          "area": "[Treatment area]",
+          "gwas_insight": "[How GWAS data informs treatment]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+        }
+      ],
+      "family_implications": "[How GWAS findings affect family risk assessment]"
+    },
+    "limitations": {
+      "population_bias": "[Limitations due to population studied]",
+      "effect_sizes": "[Limitations of effect sizes]",
+      "clinical_translation": "[Challenges in translating GWAS to clinical practice]"
+    },
+    "summary": "[Comprehensive summary of how GWAS analysis enhances the precision medicine approach for this patient]"
+  }
+}

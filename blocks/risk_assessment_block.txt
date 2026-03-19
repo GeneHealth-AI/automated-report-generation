@@ -1,0 +1,227 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive risk assessment section for a precision medicine report with DUAL SECTION SUPPORT for risk-increasing and protective variants.
+
+**THIS RISK ASSESSMENT MUST SPECIFICALLY FOCUS ON**: <PROMPT>
+
+Analyze disease risks with PRIMARY EMPHASIS on how the identified protein mutations relate to: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Detailed Protein Mutations: <PROTEIN_MUTATIONS>
+Combined Protein-Disease-Mutations Analysis: <PROTEIN_DISEASE_MUTATIONS>
+Genetic Variants: <VARIANTS>
+Family History: <FAMILY_HISTORY>
+Environmental Factors: <ENVIRONMENTALFACTORS>
+Lifestyle Factors: <LIFESTYLEFACTORS>
+Clinical History: <CLINICALHISTORY>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+ENHANCED DUAL SECTION REQUIREMENTS:
+Risk-Increasing Variants: <RISK_VARIANTS>
+Protective Variants: <PROTECTIVE_VARIANTS>
+Show Risk Section: <SHOW_RISK_SECTION>
+Show Protective Section: <SHOW_PROTECTIVE_SECTION>
+Section Configuration: <SECTION_CONFIG>
+
+CRITICAL FOCUS: Base your risk assessment primarily on the diseases associated with the identified mutated proteins. Each protein mutation should be evaluated for its specific disease risk contribution. ORGANIZE BY EFFECT DIRECTION - separate risk-increasing and protective variants into distinct subsections.
+
+DUAL SECTION LOGIC: 
+- If SHOW_RISK_SECTION is true, include "Increased Risk Factors" subsection
+- If SHOW_PROTECTIVE_SECTION is true, include "Protective Factors" subsection  
+- If both are true, present both subsections with clear differentiation
+- Use appropriate visual indicators and language for each effect type
+
+PROGRESSIVE BUILDING: Reference the specific protein mutations and disease associations established in the Mutation Profile section. Do NOT repeat the detailed mutation information - instead, build upon it to assess risk levels and clinical implications.
+
+MANDATORY CONTENT: This section MUST contain substantive risk assessment content. If protein mutation data is limited, use GWAS associations and family history to provide meaningful risk analysis. Never generate empty or minimal content.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a detailed risk assessment with DUAL SECTIONS that includes:
+
+1. INCREASED RISK FACTORS SECTION (if SHOW_RISK_SECTION is true):
+   - Overall disease risk from risk-increasing protein mutations
+   - Highest risk diseases based on risk-increasing protein associations
+   - Confidence based on strength of risk-increasing protein-disease data
+   - Risk-increasing protein-specific disease analysis
+   - Risk stratification by risk-increasing protein function
+   - Timeline for risk-increasing disease onset patterns
+
+2. PROTECTIVE FACTORS SECTION (if SHOW_PROTECTIVE_SECTION is true):
+   - Overall protective effects from protective protein variants
+   - Diseases with reduced risk based on protective protein associations
+   - Confidence based on strength of protective protein-disease data
+   - Protective protein-specific disease analysis
+   - Protection stratification by protective protein function
+   - Timeline for protective effects and risk reduction
+
+3. INTEGRATED RISK ANALYSIS (if both sections present):
+   - Net risk assessment considering both risk-increasing and protective variants
+   - Conditions where protective variants may offset risk-increasing variants
+   - Overall genetic risk profile balancing both effect types
+   - Personalized risk timeline considering all variant types
+
+4. Contributing factors organized by effect direction:
+   - Risk-increasing proteins as risk factors
+   - Protective proteins as risk-reducing factors
+   - Impact levels based on protein-disease association strength
+   - How family history validates both risk and protective effects
+
+Requirements:
+- PRIORITIZE disease risks directly linked to the mutated proteins.
+- CLASSIFICATION RATIONALE: For each risk level assigned (e.g., "High Risk"), explicitly explain the rationale based on the specific genetic findings (e.g., "Assigned High Risk due to the presence of a well-validated pathogenic variant in the BRAD2 gene...").
+- Use KnowGene protein-disease associations as primary risk indicators.
+- Quantify risk based on strength of protein-disease relationships, acknowledging limitations.
+- Consider protein pathway interactions in risk assessment while noting uncertainty.
+- Integrate family history to validate protein-associated risks.
+- Use cautious language - avoid definitive statements about risk levels.
+- Include appropriate caveats about the predictive value of genetic information.
+- Acknowledge that genetic predisposition does not guarantee disease development.
+- DO NOT HALLUCINATE - only include risks from validated protein-disease associations.
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following DUAL SECTION structure:
+
+{
+  "risk_assessment": {
+    "overall_risk_level": "[Based on cumulative protein-disease associations from both risk and protective variants]",
+    "confidence_level": "[Based on strength of protein-disease association data]",
+    "risk_summary": "[Comprehensive paragraph explaining how both risk-increasing and protective proteins contribute to overall disease risk profile]",
+    "section_visibility": {
+      "show_risk_section": "<SHOW_RISK_SECTION>",
+      "show_protective_section": "<SHOW_PROTECTIVE_SECTION>"
+    },
+    "increased_risk_factors": {
+      "section_enabled": "<SHOW_RISK_SECTION>",
+      "highest_risk_diseases": [
+        {
+          "disease": "[Disease name]",
+          "risk_level": "[X% or X-fold risk]",
+          "associated_proteins": ["[Risk-increasing Protein 1]", "[Risk-increasing Protein 2]"],
+          "evidence_strength": "[Well-established/Moderate/Emerging/Limited]",
+          "priority": "[High/Medium/Low]"
+        }
+      ],
+      "risk_increasing_proteins": [
+        {
+          "protein": "[PROTEIN NAME]",
+          "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+          "risk_impact": "[High/Moderate/Low]",
+          "disease_risks": [
+            {
+              "disease": "[Disease name]",
+              "risk_level": "[Specific risk level]",
+              "penetrance": "[High/Medium/Low]"
+            }
+          ],
+          "pathway_effects": "[How this protein mutation increases disease risk]"
+        }
+      ]
+    },
+    "protective_factors": {
+      "section_enabled": "<SHOW_PROTECTIVE_SECTION>",
+      "protective_diseases": [
+        {
+          "disease": "[Disease name]",
+          "protection_level": "[X% or X-fold protection]",
+          "associated_proteins": ["[Protective Protein 1]", "[Protective Protein 2]"],
+          "evidence_strength": "[Well-established/Moderate/Emerging/Limited]",
+          "priority": "[High/Medium/Low]"
+        }
+      ],
+      "protective_proteins": [
+        {
+          "protein": "[PROTEIN NAME]",
+          "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+          "protective_impact": "[High/Moderate/Low]",
+          "disease_protections": [
+            {
+              "disease": "[Disease name]",
+              "protection_level": "[Specific protection level]",
+              "penetrance": "[High/Medium/Low]"
+            }
+          ],
+          "pathway_effects": "[How this protein variant provides disease protection]"
+        }
+      ]
+    },
+    "integrated_risk_analysis": {
+      "net_risk_assessment": "[Overall assessment considering both risk-increasing and protective variants]",
+      "risk_protective_interactions": [
+        {
+          "condition": "[Disease/condition name]",
+          "risk_proteins": ["[Risk protein 1]", "[Risk protein 2]"],
+          "protective_proteins": ["[Protective protein 1]", "[Protective protein 2]"],
+          "net_effect": "[Increased risk/Decreased risk/Neutral/Complex]",
+          "confidence": "[High/Medium/Low]"
+        }
+      ],
+      "personalized_risk_profile": "[Comprehensive assessment of individual's genetic risk profile]"
+    },
+    "disease_category_risks": {
+      "metabolic_disease": {
+        "proteins_involved": ["[Protein 1]", "[Protein 2]"],
+        "combined_risk": "[Risk level based on protein associations]",
+        "specific_conditions": ["[Condition 1]", "[Condition 2]"]
+      },
+      "cardiovascular_disease": {
+        "proteins_involved": ["[Protein 1]", "[Protein 2]"],
+        "combined_risk": "[Risk level based on protein associations]",
+        "specific_conditions": ["[Condition 1]", "[Condition 2]"]
+      },
+      "cancer_risk": {
+        "proteins_involved": ["[Protein 1]", "[Protein 2]"],
+        "combined_risk": "[Risk level based on protein associations]",
+        "specific_conditions": ["[Condition 1]", "[Condition 2]"]
+      },
+      "other_categories": [
+        {
+          "category": "[Disease category]",
+          "proteins_involved": ["[Protein 1]", "[Protein 2]"],
+          "combined_risk": "[Risk level]",
+          "specific_conditions": ["[Condition 1]", "[Condition 2]"]
+        }
+      ]
+    },
+    "risk_timeline": {
+      "immediate_risks": [
+        {
+          "disease": "[Disease name]",
+          "timeframe": "[Timeframe]",
+          "associated_proteins": ["[Protein 1]", "[Protein 2]"]
+        }
+      ],
+      "long_term_risks": [
+        {
+          "disease": "[Disease name]",
+          "typical_onset": "[Age range or timeframe]",
+          "associated_proteins": ["[Protein 1]", "[Protein 2]"]
+        }
+      ]
+    },
+    "risk_validation": {
+      "family_history_support": "[How family history validates protein-based risk assessment]",
+      "clinical_data_correlation": "[How clinical data supports the assessment]",
+      "environmental_factors": "[Environmental factors that may modify protein-related risks]"
+    },
+    "methodology": {
+      "protein_disease_databases": ["[Database 1]", "[Database 2]"],
+      "risk_calculation_methods": "[Methods used for risk quantification]",
+      "evidence_sources": [
+        {
+          "protein": "[Protein name]",
+          "disease": "[Disease name]",
+          "source": "[KnowGene/ClinVar/etc.]",
+          "evidence_type": "[Association/Functional study/etc.]",
+          "confidence": "[High/Medium/Low]"
+        }
+      ]
+    },
+  }
+}

@@ -1,0 +1,170 @@
+Prompt: <PROMPT>
+
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive literature evidence section for a precision medicine report ORGANIZED BY EFFECT DIRECTION for risk-increasing and protective variants:
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Genetic Variants: <VARIANTS>
+Disease Focus: <DISEASEFOCUS>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+ENHANCED EFFECT DIRECTION ORGANIZATION:
+Risk-Increasing Variants: <RISK_VARIANTS>
+Protective Variants: <PROTECTIVE_VARIANTS>
+Show Risk Section: <SHOW_RISK_SECTION>
+Show Protective Section: <SHOW_PROTECTIVE_SECTION>
+Section Configuration: <SECTION_CONFIG>
+PubMed Research Evidence (High-Scoring Genes): <PUBMED_EVIDENCE>
+
+CRITICAL FOCUS: Emphasize scientific literature that establishes and validates the relationships between the identified mutated proteins and their associated diseases. ORGANIZE BY EFFECT DIRECTION - separate evidence for risk-increasing and protective variants.
+
+EFFECT DIRECTION ORGANIZATION LOGIC:
+- If SHOW_RISK_SECTION is true, include literature evidence for risk-increasing variants
+- If SHOW_PROTECTIVE_SECTION is true, include literature evidence for protective variants
+- Present distinct evidence categories for risk mechanisms vs protective mechanisms
+- Use appropriate scientific language for each effect type
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a thorough literature review ORGANIZED BY EFFECT DIRECTION that includes:
+
+1. RISK-INCREASING VARIANT EVIDENCE (if SHOW_RISK_SECTION is true):
+   - Studies validating risk-increasing protein roles in disease
+   - Mechanisms by which protein mutations increase disease risk
+   - Clinical manifestations of risk-increasing protein dysfunction
+   - Therapeutic interventions for risk mitigation
+
+2. PROTECTIVE VARIANT EVIDENCE (if SHOW_PROTECTIVE_SECTION is true):
+   - Studies validating protective protein roles in disease prevention
+   - Mechanisms by which protein variants provide disease protection
+   - Clinical benefits of protective protein function
+   - Therapeutic approaches to enhance protective effects
+
+3. COMPARATIVE LITERATURE ANALYSIS (if both sections present):
+   - Studies comparing risk-increasing vs protective variants
+   - Literature on genetic interactions between variant types
+   - Research on net effects of complex genetic profiles
+   - Clinical studies of patients with mixed variant profiles
+
+4. EFFECT-SPECIFIC RESEARCH FINDINGS:
+   - Risk-increasing variants: disease causation and progression studies
+   - Protective variants: disease prevention and resilience studies
+   - Therapeutic targeting organized by effect direction
+   - Clinical outcomes categorized by variant type
+
+5. KNOWLEDGE GAPS BY EFFECT DIRECTION:
+   - Gaps in understanding risk-increasing mechanisms
+   - Gaps in understanding protective mechanisms
+   - Need for studies on variant interactions
+
+Requirements:
+- PRIORITIZE literature establishing protein-disease relationships.
+- ACTUAL EVIDENCE CITING: Strengthen citations by providing specific, verifiable evidence (e.g., results of key clinical trials or large-scale genomic studies) rather than general summaries.
+- You may ONLY cite PMIDs that are explicitly provided in the <PUBMED_EVIDENCE> section (e.g., "(PMID: 12345678)"). If no PubMed evidence is provided for a claim, DO NOT invent a PMID.
+- Focus on studies demonstrating how protein mutations lead to disease.
+- Include therapeutic studies targeting the identified proteins.
+- Emphasize clinical translation of protein research.
+- Search protein-specific databases and literature.
+- USE PUBMED EVIDENCE FOR CITATIONS: For genes where <PUBMED_EVIDENCE> is provided, use the research summaries and PMIDs listed to strengthen the report. This evidence is specifically for genes with high mutation scores and provides peer-reviewed grounding.
+- DO NOT HALLUCINATE - only cite real studies with verifiable protein-disease data from databases or the provided PubMed evidence.
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following EFFECT DIRECTION ORGANIZATION structure:
+
+{
+  "literature_evidence": {
+    "current_understanding": "[Overview of scientific understanding of both risk-increasing and protective variants]",
+    "section_visibility": {
+      "show_risk_section": "<SHOW_RISK_SECTION>",
+      "show_protective_section": "<SHOW_PROTECTIVE_SECTION>"
+    },
+    "risk_increasing_evidence": {
+      "section_enabled": "<SHOW_RISK_SECTION>",
+      "overview": "[Summary of literature on risk-increasing variants]",
+      "protein_specific_evidence": [
+        {
+          "protein": "[RISK-INCREASING PROTEIN NAME]",
+          "disease_associations": ["[Disease 1]", "[Disease 2]"],
+          "evidence_strength": "[Well-established/Moderate/Emerging/Limited]",
+          "key_research_findings": {
+            "disease_mechanism_studies": "[How this protein mutation increases disease risk]",
+            "clinical_manifestation_studies": "[Patient outcomes with risk-increasing mutations]",
+            "therapeutic_studies": "[Risk mitigation interventions]"
+          },
+          "risk_mechanism_research": "[Studies on how mutations increase disease risk]",
+          "clinical_translation": "[How research influences risk management]"
+        }
+      ]
+    },
+    "protective_evidence": {
+      "section_enabled": "<SHOW_PROTECTIVE_SECTION>",
+      "overview": "[Summary of literature on protective variants]",
+      "protein_specific_evidence": [
+        {
+          "protein": "[PROTECTIVE PROTEIN NAME]",
+          "disease_protections": ["[Disease 1]", "[Disease 2]"],
+          "evidence_strength": "[Well-established/Moderate/Emerging/Limited]",
+          "key_research_findings": {
+            "protection_mechanism_studies": "[How this protein variant provides disease protection]",
+            "clinical_benefit_studies": "[Patient outcomes with protective variants]",
+            "enhancement_studies": "[Approaches to enhance protective effects]"
+          },
+          "protective_mechanism_research": "[Studies on how variants provide disease protection]",
+          "clinical_translation": "[How research influences protective advantage utilization]"
+        }
+      ]
+    },
+    "clinical_studies_targeting_dysfunction": [
+      {
+        "study_focus": "[Study targeting specific protein]",
+        "methods": "[Study methods]",
+        "outcomes": "[Study outcomes]",
+        "implications": "[Clinical implications]",
+        "target_protein": "[Protein name]"
+      }
+    ],
+    "emerging_therapeutic_approaches": [
+      {
+        "protein": "[Protein name]",
+        "therapeutic_strategies": "[New therapeutic strategies being developed]",
+        "development_stage": "[Preclinical/Phase I/II/III]",
+        "mechanism": "[How the therapy works]"
+      }
+    ],
+    "protein_pathway_studies": "[Research on how protein mutations affect biological pathways and disease networks]",
+    "knowledge_gaps": [
+      {
+        "protein": "[Protein name]",
+        "gap_description": "[Gap in understanding]",
+        "impact_on_treatment": "[How this affects clinical application]"
+      }
+    ],
+    "evidence_quality_assessment": {
+      "overall_strength": "[Well-established/Moderate/Emerging/Limited]",
+      "protein_associations": [
+        {
+          "protein": "[Protein name]",
+          "disease": "[Disease name]",
+          "evidence_strength": "[Well-established/Moderate/Emerging/Limited]",
+          "supporting_studies": "[Number of studies]"
+        }
+      ]
+    },
+    "key_references": [
+      {
+        "protein": "[Protein name]",
+        "disease": "[Disease name]",
+        "pmid": "[PMID number from PUBMED_EVIDENCE, or 'N/A' if none provided]",
+        "study_type": "[Study type]",
+        "key_finding": "[Key finding establishing protein-disease relationship]"
+      }
+    ]
+  }
+}

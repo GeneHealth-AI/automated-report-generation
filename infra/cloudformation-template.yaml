@@ -1,0 +1,446 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Precision Medicine PDF Report Generator - Serverless Infrastructure'
+
+Parameters:
+  InputBucketName:
+    Type: String
+    Default: precision-medicine-reports-input
+    Description: Name of the S3 bucket for input JSON files
+    
+  OutputBucketName:
+    Type: String
+    Default: precision-medicine-reports-output
+    Description: Name of the S3 bucket for output PDF files
+    
+  LayerS3Bucket:
+    Type: String
+    Description: S3 bucket containing the Lambda layer zip file
+    
+  LayerS3Key:
+    Type: String
+    Default: layers/pdf-generator-dependencies.zip
+    Description: S3 key for the Lambda layer zip file
+    
+  FunctionName:
+    Type: String
+    Default: precision-medicine-pdf-generator
+    Description: Name of the Lambda function
+
+Resources:
+  # S3 Buckets
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref InputBucketName
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: pending/
+                  - Name: suffix
+                    Value: .json
+            Function: !GetAtt PDFGeneratorFunction.Arn
+
+  OutputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref OutputBucketName
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldPDFs
+            Status: Enabled
+            ExpirationInDays: 90  # Delete PDFs after 90 days
+            NoncurrentVersionExpirationInDays: 30
+
+  # Lambda Layer
+  PDFGeneratorLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: pdf-generator-dependencies
+      Description: Dependencies for PDF Report Generator (ReportLab, etc.)
+      Content:
+        S3Bucket: !Ref LayerS3Bucket
+        S3Key: !Ref LayerS3Key
+      CompatibleRuntimes:
+        - python3.9
+        - python3.10
+        - python3.11
+
+  # Lambda Function
+  PDFGeneratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      Description: Generate PDF reports from JSON data for precision medicine
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.9
+      Timeout: 300  # 5 minutes
+      MemorySize: 1024  # 1GB RAM
+      Environment:
+        Variables:
+          INPUT_BUCKET: !Ref InputBucketName
+          OUTPUT_BUCKET: !Ref OutputBucketName
+          LOG_LEVEL: INFO
+      Layers:
+        - !Ref PDFGeneratorLayer
+      DeadLetterQueue:
+        TargetArn: !GetAtt DeadLetterQueue.Arn
+
+  # Dead Letter Queue for failed invocations
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${FunctionName}-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+      VisibilityTimeoutSeconds: 60
+
+  # IAM Role for Lambda
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${FunctionName}-execution-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                  - 's3:DeleteObject'
+                  - 's3:ListBucket'
+                  - 's3:CopyObject'
+                Resource:
+                  - !Sub '${InputBucket}/*'
+                  - !Sub '${InputBucket}'
+                  - !Sub '${OutputBucket}/*'
+                  - !Sub '${OutputBucket}'
+        - PolicyName: SQSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:SendMessage'
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  # Permission for S3 to invoke Lambda
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref PDFGeneratorFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn: !Sub '${InputBucket}'
+
+  # API Gateway for on-demand PDF generation
+  PDFGeneratorAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "${FunctionName}-api"
+      Description: API for on-demand PDF report generation
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # Request Validator for API Gateway
+  RequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      Name: RequestValidator
+      ValidateRequestBody: true
+      ValidateRequestParameters: true
+
+  # Request Model for API Gateway
+  RequestModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      Name: PDFGenerationRequest
+      ContentType: application/json
+      Schema:
+        $schema: http://json-schema.org/draft-04/schema#
+        type: object
+        required:
+          - report_data
+        properties:
+          report_data:
+            type: object
+            required:
+              - report_metadata
+            properties:
+              report_metadata:
+                type: object
+                properties:
+                  patient_name:
+                    type: string
+                  patient_id:
+                    type: string
+                  provider_name:
+                    type: string
+                  report_date:
+                    type: string
+                  focus:
+                    type: string
+              blocks:
+                type: object
+          metadata:
+            type: object
+            properties:
+              patient_name:
+                type: string
+              patient_id:
+                type: string
+              provider:
+                type: string
+              focus:
+                type: string
+          template:
+            type: object
+
+  # API Key for authentication
+  PDFGeneratorAPIKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: !Sub "${FunctionName}-api-key"
+      Description: API Key for PDF Generator API
+      Enabled: true
+
+  # Usage Plan
+  PDFGeneratorUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: !Sub "${FunctionName}-usage-plan"
+      Description: Usage plan for PDF Generator API
+      ApiStages:
+        - ApiId: !Ref PDFGeneratorAPI
+          Stage: prod
+      Throttle:
+        RateLimit: 100  # 100 requests per second
+        BurstLimit: 200  # 200 concurrent requests
+      Quota:
+        Limit: 10000  # 10,000 requests per day
+        Period: DAY
+
+  # Usage Plan Key (associates API Key with Usage Plan)
+  PDFGeneratorUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref PDFGeneratorAPIKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref PDFGeneratorUsagePlan
+
+  # API Gateway Resource
+  GenerateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      ParentId: !GetAtt PDFGeneratorAPI.RootResourceId
+      PathPart: generate
+
+  # API Gateway Method (POST)
+  GenerateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      ResourceId: !Ref GenerateResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      RequestValidatorId: !Ref RequestValidator
+      RequestModels:
+        application/json: !Ref RequestModel
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PDFGeneratorFunction.Arn}/invocations'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseHeaders:
+            Access-Control-Allow-Origin: "'*'"
+            Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            Access-Control-Allow-Methods: "'POST,OPTIONS'"
+        - StatusCode: 400
+          ResponseHeaders:
+            Access-Control-Allow-Origin: "'*'"
+        - StatusCode: 403
+          ResponseHeaders:
+            Access-Control-Allow-Origin: "'*'"
+        - StatusCode: 500
+          ResponseHeaders:
+            Access-Control-Allow-Origin: "'*'"
+
+  # API Gateway Method (OPTIONS for CORS)
+  GenerateOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      ResourceId: !Ref GenerateResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseHeaders:
+            Access-Control-Allow-Origin: true
+            Access-Control-Allow-Headers: true
+            Access-Control-Allow-Methods: true
+
+  # API Gateway Deployment
+  APIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - GenerateMethod
+      - GenerateOptionsMethod
+    Properties:
+      RestApiId: !Ref PDFGeneratorAPI
+      StageName: prod
+      StageDescription:
+        Description: Production stage for PDF generator API
+
+  # Permission for API Gateway to invoke Lambda
+  APIGatewayInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref PDFGeneratorFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PDFGeneratorAPI}/*/*'
+
+  # EventBridge Rule for scheduled batch processing (optional)
+  BatchProcessingRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "${FunctionName}-batch-processing"
+      Description: Scheduled batch processing of pending reports
+      ScheduleExpression: 'rate(1 hour)'  # Run every hour
+      State: DISABLED  # Disabled by default, enable as needed
+      Targets:
+        - Arn: !GetAtt PDFGeneratorFunction.Arn
+          Id: BatchProcessingTarget
+          Input: '{"source": "aws.events", "detail-type": "Scheduled Event"}'
+
+  # Permission for EventBridge to invoke Lambda
+  EventBridgeInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref PDFGeneratorFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt BatchProcessingRule.Arn
+
+  # CloudWatch Log Group
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${FunctionName}'
+      RetentionInDays: 14
+
+  # CloudWatch Alarms
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${FunctionName}-errors"
+      AlarmDescription: Lambda function errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref PDFGeneratorFunction
+
+  LambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${FunctionName}-duration"
+      AlarmDescription: Lambda function duration
+      MetricName: Duration
+      Namespace: AWS/Lambda
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 240000  # 4 minutes (function timeout is 5 minutes)
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref PDFGeneratorFunction
+
+Outputs:
+  InputBucketName:
+    Description: Name of the input S3 bucket
+    Value: !Ref InputBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-InputBucket"
+    
+  OutputBucketName:
+    Description: Name of the output S3 bucket
+    Value: !Ref OutputBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-OutputBucket"
+    
+  LambdaFunctionArn:
+    Description: ARN of the PDF generator Lambda function
+    Value: !GetAtt PDFGeneratorFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaArn"
+    
+  APIEndpoint:
+    Description: URL of the PDF generator API endpoint
+    Value: !Sub 'https://${PDFGeneratorAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/generate'
+    Export:
+      Name: !Sub "${AWS::StackName}-APIEndpoint"
+    
+  DeadLetterQueueUrl:
+    Description: URL of the dead letter queue
+    Value: !Ref DeadLetterQueue
+    Export:
+      Name: !Sub "${AWS::StackName}-DLQUrl"
+    
+  APIKeyId:
+    Description: API Key ID for accessing the PDF generator API
+    Value: !Ref PDFGeneratorAPIKey
+    Export:
+      Name: !Sub "${AWS::StackName}-APIKeyId"

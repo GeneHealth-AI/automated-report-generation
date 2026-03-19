@@ -1,0 +1,179 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive clinical implications section for a precision medicine report with RISK/PROTECTIVE CATEGORIZATION.
+
+**THIS SECTION MUST FOCUS SPECIFICALLY ON CLINICAL IMPLICATIONS FOR**: <PROMPT>
+
+Analyze the clinical implications of protein mutations with specific attention to how they impact: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Detailed Protein Mutations: <PROTEIN_MUTATIONS>
+Combined Protein-Disease-Mutations Analysis: <PROTEIN_DISEASE_MUTATIONS>
+Genetic Variants: <VARIANTS>
+Family History: <FAMILY_HISTORY>
+Current Medications: <MEDICATIONS>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+ENHANCED RISK/PROTECTIVE CATEGORIZATION:
+Risk-Increasing Variants: <RISK_VARIANTS>
+Protective Variants: <PROTECTIVE_VARIANTS>
+Show Risk Section: <SHOW_RISK_SECTION>
+Show Protective Section: <SHOW_PROTECTIVE_SECTION>
+Section Configuration: <SECTION_CONFIG>
+
+CRITICAL FOCUS: Center your analysis on the specific diseases associated with the identified mutated proteins and their clinical management implications. ORGANIZE BY EFFECT DIRECTION - separate clinical implications for risk-increasing and protective variants.
+
+RISK/PROTECTIVE CATEGORIZATION LOGIC:
+- If SHOW_RISK_SECTION is true, include clinical implications for risk-increasing variants
+- If SHOW_PROTECTIVE_SECTION is true, include clinical implications for protective variants
+- Present distinct management strategies for each variant type
+- Use appropriate clinical language for risk management vs protective advantage utilization
+
+PROGRESSIVE BUILDING: Build upon the Mutation Profile and Risk Assessment sections. Reference the specific proteins, mutations, and risk levels already established. Do NOT repeat mutation details or risk assessments - instead, translate them into actionable clinical recommendations.
+
+PROTEIN-MUTATION MAPPING: Ensure every clinical recommendation is tied to specific protein mutations identified in the patient. Use the exact protein names and mutation descriptions from previous sections.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a detailed clinical implications analysis with RISK/PROTECTIVE CATEGORIZATION that includes:
+
+1. RISK-INCREASING VARIANT CLINICAL IMPLICATIONS (if SHOW_RISK_SECTION is true):
+   - Treatment considerations for risk-increasing protein mutations
+   - Disease screening strategies for increased risk conditions
+   - Risk management and mitigation approaches
+   - Monitoring protocols for high-risk disease development
+   - Pharmacogenomic considerations for risk-increasing variants
+
+2. PROTECTIVE VARIANT CLINICAL IMPLICATIONS (if SHOW_PROTECTIVE_SECTION is true):
+   - Clinical advantages from protective protein variants
+   - Reduced screening requirements for protected conditions
+   - Leveraging protective effects in treatment planning
+   - Monitoring to maintain protective benefits
+   - Pharmacogenomic advantages from protective variants
+
+3. INTEGRATED CLINICAL MANAGEMENT (if both sections present):
+   - Balancing risk management with protective advantages
+   - Personalized screening protocols considering both variant types
+   - Treatment strategies that account for complex genetic profile
+   - Family counseling considering both risk and protective inheritance
+
+4. VARIANT-SPECIFIC CLINICAL ACTIONS:
+   - Risk-increasing proteins: targeted interventions and monitoring
+   - Protective proteins: optimization and maintenance strategies
+   - Evidence levels for each clinical recommendation
+   - Priority ranking based on variant effect strength
+
+
+Requirements:
+- PRIORITIZE clinical actions based on the specific proteins mutated and their disease associations
+- Focus on conditions directly linked to the identified protein mutations
+- Use KnowGene associations to guide disease-specific recommendations while acknowledging evidence limitations
+- Include protein-targeted therapeutic options where available, noting their experimental status if applicable
+- Base screening on diseases associated with the mutated proteins, with appropriate caveats about predictive value
+- Use cautious language - recommendations should be presented as considerations rather than definitive requirements
+- Acknowledge that genetic information should be interpreted in clinical context
+- DO NOT HALLUCINATE - only include protein-disease associations from validated sources
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following RISK/PROTECTIVE CATEGORIZATION structure:
+
+{
+  "clinical_implications": {
+    "section_visibility": {
+      "show_risk_section": "<SHOW_RISK_SECTION>",
+      "show_protective_section": "<SHOW_PROTECTIVE_SECTION>"
+    },
+    "risk_increasing_implications": {
+      "section_enabled": "<SHOW_RISK_SECTION>",
+      "protein_specific_treatments": [
+        {
+          "protein": "[Risk-increasing protein name]",
+          "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+          "clinical_management": "[Risk management strategies for this protein]",
+          "targeted_interventions": "[Risk mitigation therapies if available]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]",
+          "priority": "[High/Medium/Low]"
+        }
+      ],
+      "risk_management_screening": [
+        {
+          "disease": "[Disease name]",
+          "associated_protein": "[Risk-increasing protein name]",
+          "screening_test": "[Specific screening test]",
+          "frequency": "[Increased frequency based on risk]",
+          "starting_age": "[Earlier screening age due to risk]",
+          "rationale": "[Risk-based screening justification]"
+        }
+      ]
+    },
+    "protective_implications": {
+      "section_enabled": "<SHOW_PROTECTIVE_SECTION>",
+      "protective_advantages": [
+        {
+          "protein": "[Protective protein name]",
+          "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+          "clinical_advantages": "[Protective benefits for clinical management]",
+          "optimization_strategies": "[Ways to maintain/enhance protective effects]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]",
+          "priority": "[High/Medium/Low]"
+        }
+      ],
+      "reduced_screening_requirements": [
+        {
+          "disease": "[Disease name]",
+          "associated_protein": "[Protective protein name]",
+          "screening_modification": "[Reduced frequency or delayed start]",
+          "rationale": "[Protection-based screening adjustment justification]"
+        }
+      ]
+    },
+    "disease_screening": [
+      {
+        "disease": "[Disease name]",
+        "associated_protein": "[Protein name]",
+        "screening_test": "[Specific screening test]",
+        "frequency": "[How often based on protein-disease association]",
+        "starting_age": "[When to begin based on disease onset patterns]",
+        "rationale": "[Direct link between protein mutation and disease risk]"
+      }
+    ],
+    "pharmacogenomic_implications": [
+      {
+        "protein": "[Protein name]",
+        "drug_response_effect": "[How mutation affects drug response/metabolism]",
+        "affected_medications": ["[Drug 1]", "[Drug 2]"],
+        "clinical_action": "[Dose adjustment, avoidance, or alternative]",
+        "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+      }
+    ],
+    "family_risk_assessment": {
+      "summary": "[Comprehensive analysis of how the identified protein mutations affect disease risk in family members]",
+      "specific_risks": [
+        {
+          "protein": "[Protein name]",
+          "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+          "inheritance_pattern": "[Autosomal dominant/recessive/X-linked]",
+          "family_screening_recommendations": "[Specific recommendations for family members]"
+        }
+      ]
+    },
+    "evidence_sources": {
+      "databases": ["[Database 1]", "[Database 2]"],
+      "protein_disease_associations": [
+        {
+          "protein": "[Protein name]",
+          "disease": "[Disease name]",
+          "source": "[KnowGene/ClinVar/etc.]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+        }
+      ],
+      "clinical_guidelines": ["[Guideline 1]", "[Guideline 2]"]
+    },
+  }
+}

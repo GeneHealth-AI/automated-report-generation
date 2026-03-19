@@ -1,0 +1,348 @@
+<div class="report-block risk-assessment-block" data-block-type="risk_assessment">
+    <div class="block-header">
+        <h2 style="color: var(--primary-blue);">{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.overall_risk_level %}
+        <div class="assessment-header">
+            <div class="assessment-level-card">
+                <label>Overall Risk Level</label>
+                <div class="level-value">{{ block.content.overall_risk_level }} <strong>Risk</strong></div>
+                {% if block.content.confidence_level %}
+                <div class="confidence-badge">{{ block.content.confidence_level }}</div>
+                {% endif %}
+            </div>
+            {% if block.content.risk_summary %}
+            <div class="technical-explanation">
+                <h3 class="technical-heading"><i class="fas fa-microscope"></i> Risk Summary</h3>
+                <div class="risk-summary-text">
+                    <p>{{ block.content.risk_summary | link_pmids | safe }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if block.content.increased_risk_factors and block.content.increased_risk_factors.highest_risk_diseases %}
+        <div class="risk-factors-section">
+            <h3 class="technical-heading"><i class="fas fa-exclamation-triangle" style="color: var(--error-red);"></i>
+                Risk-Increasing Factors</h3>
+            <div class="diseases-grid">
+                {% for disease in block.content.increased_risk_factors.highest_risk_diseases %}
+                <div class="disease-card risk-card">
+                    <div class="disease-name">{{ disease.disease }}</div>
+                    <div class="disease-detail"><strong>Risk Level:</strong> {{ disease.risk_level }}</div>
+                    <div class="disease-detail"><strong>Proteins:</strong> {{ disease.associated_proteins | join(', ')
+                        }}</div>
+                    <div class="disease-detail"><strong>Evidence:</strong> <span class="evidence-badge">{{
+                            disease.evidence_strength }}</span></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.protective_factors and block.content.protective_factors.protective_diseases %}
+        <div class="protective-factors-section">
+            <h3 class="technical-heading"><i class="fas fa-shield-alt" style="color: var(--success-green);"></i> Protective Factors
+            </h3>
+            <div class="diseases-grid">
+                {% for disease in block.content.protective_factors.protective_diseases %}
+                <div class="disease-card protective-card">
+                    <div class="disease-name">{{ disease.disease }}</div>
+                    <div class="disease-detail"><strong>Protection Level:</strong> {{ disease.protection_level }}</div>
+                    <div class="disease-detail"><strong>Proteins:</strong> {{ disease.associated_proteins | join(', ')
+                        }}</div>
+                    <div class="disease-detail"><strong>Evidence:</strong> <span class="evidence-badge">{{
+                            disease.evidence_strength }}</span></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="assessment-note">
+            <i class="fas fa-user-md"></i>
+            <div>
+                <strong>Technical Note:</strong> This assessment is derived from identified genomic variations and
+                correlated with existing clinical literature. It is intended for healthcare provider use in
+                individualizing patient surveillance and management strategies.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<style>
+    .risk-assessment-block {
+    }
+
+    .assessment-header {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        align-items: stretch;
+    }
+
+    .assessment-level-card {
+        flex: 0 0 300px;
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+        padding: 1.5rem;
+        border-radius: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .assessment-level-card label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .level-value {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--text-heading);
+        line-height: 1.4;
+    }
+
+    .confidence-badge {
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .risk-factors-section,
+    .protective-factors-section {
+        margin-bottom: 3rem;
+    }
+
+    .diseases-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .disease-card {
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .disease-card.risk-card {
+        border-left: 4px solid var(--error-red);
+        background: #fefafa;
+    }
+
+    .disease-card.protective-card {
+        border-left: 4px solid var(--success-green);
+        background: #f0fdf4;
+    }
+
+    .disease-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-heading);
+        margin-bottom: 1rem;
+    }
+
+    .disease-detail {
+        font-size: 0.95rem;
+        color: var(--secondary-text);
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    .evidence-badge {
+        background: #e0f2fe;
+        color: var(--evidence-strong);
+        padding: 0.25rem 0.625rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .risk-high .level-value {
+        color: #334155;
+    }
+
+    .risk-moderate .level-value {
+        color: #d97706;
+    }
+
+    .risk-low .level-value {
+        color: #059669;
+    }
+
+    .technical-explanation {
+        flex: 2 1 0;
+        min-width: 0;
+    }
+
+    .technical-heading {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-heading);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .technical-explanation p {
+        font-size: 1rem;
+        color: var(--secondary-text);
+        line-height: 1.6;
+    }
+
+    .risk-summary-text {
+        line-height: 1.6;
+    }
+
+    .timeline-section {
+        margin-bottom: 3rem;
+    }
+
+    .timeline-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .timeline-col {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .col-header {
+        padding: 1rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .col-header.short {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .col-header.long {
+        background: #fdf2f8;
+        color: #9d174d;
+    }
+
+    .timeline-points {
+        list-style: none;
+        padding: 1.25rem;
+        margin: 0;
+    }
+
+    .timeline-points li {
+        font-size: 0.9rem;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        padding-left: 1.25rem;
+        position: relative;
+    }
+
+    .timeline-points li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #94a3b8;
+        font-weight: 900;
+    }
+
+    .assessment-note {
+        margin-top: 3rem;
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+        padding: 1.25rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+    }
+
+    .assessment-note i {
+        font-size: 1.25rem;
+        margin-top: 2px;
+        color: var(--text-light);
+    }
+
+    @media (max-width: 768px) {
+        .assessment-header {
+            flex-direction: column;
+        }
+
+        .assessment-level-card {
+            width: 100%;
+        }
+
+        .timeline-grid,
+        .diseases-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<style>
+    .risk-assessment-block .risk-timeline-section {
+        margin-top: 24px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid var(--border, #c8d4de);
+    }
+
+    .risk-assessment-block .timeline-group {
+        margin-bottom: 16px;
+    }
+
+    .risk-assessment-block .timeline-group h4 {
+        margin: 0 0 12px 0;
+        font-size: 1rem;
+        color: #475569;
+    }
+
+    .risk-assessment-block .timeline-list {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .risk-assessment-block .timeline-list li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+
+    .risk-assessment-block .protective-factors {
+        margin-top: 24px;
+        padding: 20px;
+        background: #e6f7e6;
+        border-radius: 12px;
+        border: 1px solid #a8d8a8;
+    }
+</style>

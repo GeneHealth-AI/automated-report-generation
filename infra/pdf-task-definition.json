@@ -1,0 +1,50 @@
+{
+  "family": "report-generator-pdf",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::339712911975:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::339712911975:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "report-generator-pdf",
+      "image": "339712911975.dkr.ecr.us-east-1.amazonaws.com/report-generator-pdf:latest",
+      "essential": true,
+      "environment": [
+        {
+          "name": "PYTHONUNBUFFERED",
+          "value": "1"
+        },
+        {
+          "name": "QT_QPA_PLATFORM",
+          "value": "offscreen"
+        },
+        {
+          "name": "DISPLAY",
+          "value": ":99"
+        },
+        {
+          "name": "BLOCKS_PATH",
+          "value": "./blocks"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/report-generator-pdf",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "python -c 'import sys; sys.exit(0)'"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

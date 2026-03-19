@@ -1,0 +1,108 @@
+<div class="report-block executive-summary-block" data-block-type="executive_summary">
+    <div class="block-header">
+        <h2 style="color: var(--primary-blue);">{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.summary_statement %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-star" style="color: #f59e0b;"></i> Bottom Line</h3>
+            <div class="summary-statement-card">
+                <p>{{ block.content.summary_statement }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.summary_points %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-key" style="color: #3b82f6;"></i> Key Summary Points</h3>
+            <div class="points-grid">
+                {% for point in block.content.summary_points %}
+                <div class="point-item">
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    <span>{{ point }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="executive-note">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>A Note on Your Results:</strong> This summary provides the most critical takeaways from your
+                report. Detailed genetic analysis and clinical context can be found in the following sections.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .executive-summary-block {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .executive-summary-block .block-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+    }
+
+    .summary-statement-card {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.75rem;
+        border: 1px solid #e2e8f0;
+        font-size: 1.15rem;
+        color: #1e293b;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    .points-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .point-item {
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        padding: 1.25rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .point-item span {
+        font-size: 1rem;
+        color: #475569;
+    }
+
+    .executive-note {
+        margin-top: 3rem;
+        background: #fdf2f8;
+        border: 1px solid #fce7f3;
+        padding: 1.25rem;
+        border-radius: 12px;
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: #9d174d;
+    }
+
+    .executive-note i {
+        font-size: 1.25rem;
+        margin-top: 2px;
+    }
+</style>

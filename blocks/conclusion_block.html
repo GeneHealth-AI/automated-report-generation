@@ -1,0 +1,201 @@
+<div class="report-block conclusion-block" data-block-type="conclusion">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.summary %}
+        <div class="conclusion-hero">
+            <div class="conclusion-icon"><i class="fas fa-clipboard-check"></i></div>
+            <div class="conclusion-text">
+                <h3>Clinical Synthesis</h3>
+                <p>{{ block.content.summary }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="conclusion-hero">
+            <div class="conclusion-icon"><i class="fas fa-clipboard-check"></i></div>
+            <div class="conclusion-text">
+                <h3>Clinical Synthesis</h3>
+                {% if block.content is mapping %}
+                <p>{{ block.content.summary or block.content.summary_of_significance or block.content.conclusion_summary
+                    or "Scientific summary of clinical findings and their significance." }}</p>
+                {% else %}
+                <p>{{ block.content }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.next_steps %}
+        <div class="next-steps-container">
+            <h4>Recommended Next Steps</h4>
+            <div class="next-steps-grid">
+                {% for step in block.content.next_steps %}
+                <div class="next-step-card">
+                    <div class="step-header">
+                        <span class="step-priority {{ step.priority | lower }}">{{ step.priority }}</span>
+                    </div>
+                    <div class="step-body">
+                        <h5>{{ step.action }}</h5>
+                        <p>{{ step.rationale }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="final-disclosure">
+            <div class="disclosure-header">
+                <i class="fas fa-shield-alt"></i>
+                <span>Clinical Interpretation Disclaimer</span>
+            </div>
+            <p>
+                This report is based on current clinical evidence and genetic data available at the time of analysis.
+                Genetic findings should always be interpreted in the context of personal medical history, family
+                history,
+                and clinical symptoms by a qualified healthcare professional.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .conclusion-block {
+        color: var(--text-main);
+    }
+
+    .conclusion-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .conclusion-hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        display: flex;
+        gap: 32px;
+        align-items: center;
+        margin-bottom: 48px;
+    }
+
+    .conclusion-icon {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--primary-blue);
+        box-shadow: var(--card-shadow);
+    }
+
+    .conclusion-text h3 {
+        margin: 0 0 12px 0;
+        font-size: var(--text-xl);
+        color: var(--text-heading);
+    }
+
+    .conclusion-text p {
+        margin: 0;
+        font-size: var(--text-md);
+        line-height: 1.7;
+        color: var(--text-muted);
+    }
+
+    .next-steps-container h4 {
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--text-heading);
+        margin-bottom: 24px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .next-steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-bottom: 60px;
+    }
+
+    .next-step-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+    }
+
+    .next-step-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .step-priority {
+        font-size: var(--text-xs);
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        text-transform: uppercase;
+    }
+
+    .step-priority.high {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .step-priority.medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .step-priority.low {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .step-body h5 {
+        margin: 16px 0 8px 0;
+        font-size: var(--text-md);
+        color: var(--text-heading);
+    }
+
+    .step-body p {
+        margin: 0;
+        font-size: var(--text-sm);
+        line-height: 1.6;
+        color: var(--text-muted);
+    }
+
+    .final-disclosure {
+        background: #f8fafc;
+        border-top: 4px solid var(--primary-blue);
+        padding: 32px;
+        border-radius: var(--radius-lg);
+        color: #64748b;
+    }
+
+    .disclosure-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .final-disclosure p {
+        margin: 0;
+        font-size: var(--text-sm);
+        line-height: 1.7;
+    }
+</style>

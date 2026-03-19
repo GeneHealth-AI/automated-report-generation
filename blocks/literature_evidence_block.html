@@ -1,0 +1,369 @@
+<div class="report-block literature-evidence-block" data-block-type="literature_evidence">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.current_understanding %}
+        <div class="lit-section understanding-hero">
+            <div class="lit-icon"><i class="fas fa-microscope"></i></div>
+            <div class="lit-text">
+                <h3>Scientific Context & Landscape</h3>
+                <p>{{ block.content.current_understanding | link_pmids | safe }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.risk_increasing_evidence and
+        block.content.risk_increasing_evidence.protein_specific_evidence %}
+        <div class="lit-section">
+            <div class="lit-section-header">
+                <i class="fas fa-dna" style="color: var(--error-red);"></i>
+                <h4>Evidence for Risk-Increasing Variants</h4>
+            </div>
+            {% if block.content.risk_increasing_evidence.overview %}
+            <p class="lit-overview">{{ block.content.risk_increasing_evidence.overview | link_pmids | safe }}</p>
+            {% endif %}
+            <div class="lit-cards-container">
+                {% for protein_data in block.content.risk_increasing_evidence.protein_specific_evidence %}
+                <div class="lit-card lit-risk-card">
+                    <div class="lit-card-top">
+                        <span class="lit-protein-tag">{{ protein_data.protein }}</span>
+                        <span class="lit-strength-badge">{{ protein_data.evidence_strength }}</span>
+                    </div>
+                    <div class="lit-card-body">
+                        <div class="lit-associations">
+                            <strong>Disease Associations:</strong> {{ protein_data.disease_associations | join(', ') }}
+                        </div>
+                        {% if protein_data.key_research_findings %}
+                        <div class="lit-mechanisms">
+                            {% if protein_data.key_research_findings.disease_mechanism_studies %}
+                            <div class="lit-mechanism-item">
+                                <span class="m-label">Molecular Mechanism:</span>
+                                {{ protein_data.key_research_findings.disease_mechanism_studies | link_pmids | safe }}
+                            </div>
+                            {% endif %}
+                            {% if protein_data.key_research_findings.clinical_manifestation_studies %}
+                            <div class="lit-mechanism-item">
+                                <span class="m-label">Clinical Manifestation:</span>
+                                {{ protein_data.key_research_findings.clinical_manifestation_studies | link_pmids | safe
+                                }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.protective_evidence and block.content.protective_evidence.protein_specific_evidence %}
+        <div class="lit-section">
+            <div class="lit-section-header">
+                <i class="fas fa-shield-halved" style="color: var(--success-green);"></i>
+                <h4>Evidence for Protective Factors</h4>
+            </div>
+            {% if block.content.protective_evidence.overview %}
+            <p class="lit-overview">{{ block.content.protective_evidence.overview | link_pmids | safe }}</p>
+            {% endif %}
+            <div class="lit-cards-container">
+                {% for protein_data in block.content.protective_evidence.protein_specific_evidence %}
+                <div class="lit-card lit-protective-card">
+                    <div class="lit-card-top">
+                        <span class="lit-protein-tag">{{ protein_data.protein }}</span>
+                        <span class="lit-strength-badge">{{ protein_data.evidence_strength }}</span>
+                    </div>
+                    <div class="lit-card-body">
+                        <div class="lit-associations">
+                            <strong>Observed Protection:</strong> {{ protein_data.disease_associations | join(', ') }}
+                        </div>
+                        {% if protein_data.key_research_findings %}
+                        <div class="lit-mechanisms">
+                            {% if protein_data.key_research_findings.disease_mechanism_studies %}
+                            <div class="lit-mechanism-item">
+                                <span class="m-label">Protective Mechanism:</span>
+                                {{ protein_data.key_research_findings.disease_mechanism_studies | link_pmids | safe }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.key_references %}
+        <div class="lit-section">
+            <div class="lit-section-header">
+                <i class="fas fa-book-open-reader"></i>
+                <h4>Key Literary References</h4>
+            </div>
+            <div class="references-block">
+                {% for ref in block.content.key_references %}
+                <div class="ref-row">
+                    <div class="ref-protein-col">{{ ref.protein }}</div>
+                    <div class="ref-content-col">
+                        <div class="ref-finding">{{ ref.key_finding | link_pmids | safe }}</div>
+                        {% if ref.pmid and ref.pmid != 'N/A' and ref.pmid != 'None' %}
+                        <a href="https://pubmed.ncbi.nlm.nih.gov/{{ ref.pmid }}/" target="_blank" class="ref-pmid-tag">
+                            <i class="fas fa-external-link-alt"></i> PMID {{ ref.pmid }}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="lit-footer-banner">
+            <i class="fas fa-circle-info"></i>
+            <div class="banner-content">
+                <strong>Evidence Disclosure:</strong> The citations presented are computationally curated from
+                peer-reviewed databases. While reflective of contemporary research, they should be reviewed by a
+                specialist clinicians as part of a comprehensive diagnostic evaluation.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .literature-evidence-block {
+        color: var(--text-main);
+    }
+
+    .literature-evidence-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .lit-section {
+        margin-bottom: 60px;
+    }
+
+    .understanding-hero {
+        background: #f8fafc;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        display: flex;
+        gap: 32px;
+        align-items: center;
+    }
+
+    .lit-icon {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--primary-blue);
+        box-shadow: var(--card-shadow);
+    }
+
+    .lit-text h3 {
+        margin: 0 0 12px 0;
+        font-size: var(--text-xl);
+        color: var(--text-heading);
+    }
+
+    .lit-text p {
+        margin: 0;
+        font-size: var(--text-md);
+        line-height: 1.7;
+        color: var(--text-muted);
+    }
+
+    .lit-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        color: var(--text-heading);
+    }
+
+    .lit-section-header h4 {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .lit-overview {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        margin-bottom: 32px;
+        line-height: 1.6;
+        max-width: 900px;
+    }
+
+    .lit-cards-container {
+        display: grid;
+        gap: 24px;
+    }
+
+    .lit-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+    }
+
+    .lit-card:hover {
+        transform: translateX(4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .lit-risk-card {
+        border-left: 5px solid var(--error-red);
+    }
+
+    .lit-protective-card {
+        border-left: 5px solid var(--success-green);
+    }
+
+    .lit-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .lit-protein-tag {
+        font-size: var(--text-lg);
+        font-weight: 800;
+        color: var(--text-heading);
+    }
+
+    .lit-strength-badge {
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .lit-associations {
+        font-size: var(--text-md);
+        color: var(--text-main);
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .lit-mechanisms {
+        display: grid;
+        gap: 16px;
+    }
+
+    .lit-mechanism-item {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .m-label {
+        font-weight: 800;
+        color: var(--text-heading);
+        margin-right: 8px;
+    }
+
+    /* References Table-like View */
+    .references-block {
+        background: #f8fafc;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+    }
+
+    .ref-row {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        padding: 24px;
+        border-bottom: 1px solid var(--border-light);
+        gap: 32px;
+    }
+
+    .ref-row:last-child {
+        border-bottom: none;
+    }
+
+    .ref-protein-col {
+        font-weight: 800;
+        color: var(--primary-blue);
+        font-size: var(--text-md);
+    }
+
+    .ref-finding {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+        color: var(--text-main);
+        margin-bottom: 12px;
+    }
+
+    .ref-pmid-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border: 1px solid var(--border-light);
+        padding: 6px 12px;
+        border-radius: var(--radius-md);
+        font-size: var(--text-xs);
+        font-weight: 700;
+        color: var(--primary-blue);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .ref-pmid-tag:hover {
+        background: var(--primary-blue);
+        color: white;
+        border-color: var(--primary-blue);
+    }
+
+    /* Footer Banner */
+    .lit-footer-banner {
+        margin-top: 80px;
+        background: #fff;
+        border: 1px solid var(--border-light);
+        padding: 32px;
+        border-radius: var(--radius-2xl);
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        color: #64748b;
+    }
+
+    .lit-footer-banner i {
+        font-size: 24px;
+        color: var(--primary-blue);
+    }
+
+    .banner-content {
+        font-size: var(--text-sm);
+        line-height: 1.7;
+    }
+</style>

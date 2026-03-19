@@ -1,0 +1,63 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+
+Generate an introduction section for a precision medicine report with the following specific focus:
+
+**PRIMARY FOCUS**: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create an introduction that includes:
+
+1. An overview that explains the purpose and scope of this precision medicine report, SPECIFICALLY TAILORED TO: <PROMPT>
+
+2. An approach section describing the methodology used for genetic analysis and interpretation, with particular emphasis on how it relates to: <PROMPT>
+
+3. A scope section that clearly defines what is included in the report, focusing on genetic factors relevant to: <PROMPT>
+
+4. Important disclaimers and considerations that help set appropriate expectations and context for the genetic information provided, particularly as it relates to the specific condition/focus area.
+
+Requirements:
+- Use professional yet accessible language
+- CRITICALLY IMPORTANT: Tailor ALL content specifically to address: <PROMPT>
+- Explain complex concepts in understandable terms
+- Include appropriate caveats about genetic testing limitations
+- Emphasize the importance of clinical context and professional interpretation
+- DO NOT HALLUCINATE - use standard language appropriate for genetic reports
+- Make sure every section reflects the specific disease/condition focus provided in the prompt
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "introduction": {
+    "overview": "[Comprehensive paragraph explaining the report's purpose, value, and specific relevance to the disease focus provided]",
+    "analytical_approach": {
+      "methodology": "[Detailed explanation of the methodology used for genetic analysis]",
+      "data_sources": ["[Source 1]", "[Source 2]", "[Source 3]"],
+      "analytical_frameworks": ["[Framework 1]", "[Framework 2]"]
+    },
+    "scope_of_analysis": {
+      "coverage": "[What this report covers]",
+      "genetic_variants_analyzed": ["[Variant type 1]", "[Variant type 2]"],
+      "genes_examined": ["[Gene category 1]", "[Gene category 2]"],
+      "analysis_boundaries": "[Boundaries and limitations of the analysis]"
+    },
+    "important_disclaimers": [
+      {
+        "category": "[Disclaimer category]",
+        "content": "[Disclaimer text]"
+      }
+    ],
+    "references_and_guidelines": {
+      "clinical_guidelines": ["[Guideline 1]", "[Guideline 2]"],
+      "standards": ["[Standard 1]", "[Standard 2]"],
+      "authoritative_sources": ["[Source 1]", "[Source 2]"]
+    }
+  }
+}

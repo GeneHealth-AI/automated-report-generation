@@ -1,0 +1,26 @@
+Summary of Findings: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a concluding section for the precision medicine report focused on: <PROMPT>
+
+Include:
+1. A summary of the clinical significance of the findings presented in the report.
+2. Clear next steps for the patient and healthcare provider.
+3. Encouraging final remarks highlighting the importance of genetic data in personalizing healthcare.
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as follows:
+{
+  "conclusion": {
+    "summary_of_significance": "[Comprehensive summary of what these genetic findings mean for the patient's health overall]",
+    "recommended_next_steps": [
+      {
+        "action": "[Specific action]",
+        "timeline": "[Recommended timeline]",
+        "responsible_party": "[Patient/Provider/Specialist]"
+      }
+    ],
+    "provider_consultation_points": ["[Point 1]", "[Point 2]"],
+    "closing_statement": "[A professional and encouraging final statement]"
+  }
+}

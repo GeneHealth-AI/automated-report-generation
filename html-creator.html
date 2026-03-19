@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genetic Report Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #475569;
+            background-color: #F8FAFC;
+        }
+        
+        /* Two-column layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 25%;
+            min-width: 300px;
+            background-color: #1E293B;
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            width: 75%;
+            padding: 2rem;
+            background-color: #F8FAFC;
+        }
+        
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #64748B;
+        }
+        
+        /* Report sections */
+        .report-section {
+            background-color: #FFFFFF;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .report-section:hover {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3B82F6;
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Sidebar navigation */
+        .nav-title {
+            color: #FFFFFF;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #CBD5E1;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: #FFFFFF;
+            background-color: #3B82F6;
+            transform: translateX(4px);
+        }
+        
+        /* Badge components */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .badge-risk-high {
+            background-color: #FEE2E2;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+        }
+        
+        .badge-risk-medium {
+            background-color: #FEF3C7;
+            color: #D97706;
+            border: 1px solid #FDE68A;
+        }
+        
+        .badge-risk-low {
+            background-color: #DBEAFE;
+            color: #2563EB;
+            border: 1px solid #BFDBFE;
+        }
+        
+        .badge-neutral {
+            background-color: #F1F5F9;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+        }
+        
+        .badge-protective {
+            background-color: #D1FAE5;
+            color: #059669;
+            border: 1px solid #A7F3D0;
+        }
+        
+        /* Risk meter component */
+        .risk-meter {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .risk-meter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .risk-meter-label {
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .risk-meter-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .risk-meter-bar {
+            height: 8px;
+            background-color: #E2E8F0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .risk-meter-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .risk-meter-fill-high {
+            background-color: #EF4444;
+        }
+        
+        .risk-meter-fill-medium {
+            background-color: #F59E0B;
+        }
+        
+        .risk-meter-fill-low {
+            background-color: #3B82F6;
+        }
+        
+        /* Card components */
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            border-color: #CBD5E1;
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin-bottom: 1rem;
+        }
+        
+        /* Table styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .data-table td {
+            border: 1px solid #E2E8F0;
+            padding: 0.75rem;
+            vertical-align: top;
+        }
+        
+        .data-table tr:hover {
+            background-color: #F8FAFC;
+        }
+        
+        /* Collapsible/Accordion styles */
+        .collapsible {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            background-color: #F8FAFC;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .collapsible-header:hover {
+            background-color: #F1F5F9;
+        }
+        
+        .collapsible-title {
+            font-weight: 600;
+            color: #334155;
+            margin: 0;
+        }
+        
+        .collapsible-icon {
+            transition: transform 0.2s ease;
+        }
+        
+        .collapsible-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            padding: 1.5rem;
+            display: none;
+        }
+        
+        .collapsible-content.expanded {
+            display: block;
+        }
+        
+        /* Priority indicators */
+        .priority-high {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .priority-medium {
+            border-left: 4px solid #F59E0B;
+        }
+        
+        .priority-low {
+            border-left: 4px solid #3B82F6;
+        }
+        
+        /* Alert boxes */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background-color: #EFF6FF;
+            border-color: #3B82F6;
+            color: #1E40AF;
+        }
+        
+        .alert-warning {
+            background-color: #FFFBEB;
+            border-color: #F59E0B;
+            color: #92400E;
+        }
+        
+        .alert-danger {
+            background-color: #FEF2F2;
+            border-color: #EF4444;
+            color: #DC2626;
+        }
+        
+        .alert-success {
+            background-color: #F0FDF4;
+            border-color: #10B981;
+            color: #065F46;
+        }
+        
+        /* Protein/Gene tags */
+        .gene-tag {
+            display: inline-block;
+            background-color: #EFF6FF;
+            color: #2563EB;
+            padding: 0.25rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.125rem;
+            border: 1px solid #BFDBFE;
+        }
+        
+        /* Hidden by default */
+        .report-section {
+            display: none;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1000px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .report-section {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .nav-link {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                width: 100%;
+                padding: 0;
+            }
+            
+            .report-section {
+                box-shadow: none;
+                border: 1px solid #E2E8F0;
+                margin-bottom: 1rem;
+                page-break-inside: avoid;
+            }
+            
+            .collapsible-content {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2 class="nav-title">Report Contents</h2>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#introduction" class="nav-link" data-section="introduction">Introduction</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#executive-summary" class="nav-link" data-section="executive-summary">Executive Summary</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#mutation-profile" class="nav-link" data-section="mutation-profile">Mutation Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#risk-assessment" class="nav-link" data-section="risk-assessment">Risk Assessment</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#clinical-implications" class="nav-link" data-section="clinical-implications">Clinical Implications</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#lifestyle-recommendations" class="nav-link" data-section="lifestyle-recommendations">Lifestyle Recommendations</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#monitoring-plan" class="nav-link" data-section="monitoring-plan">Monitoring Plan</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#variant-explanations" class="nav-link" data-section="variant-explanations">Variant Explanations</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#gwas-analysis" class="nav-link" data-section="gwas-analysis">GWAS Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#literature-evidence" class="nav-link" data-section="literature-evidence">Literature Evidence</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#research-opportunities" class="nav-link" data-section="research-opportunities">Research Opportunities</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                Loading genetic report...
+            </div>
+            
+            <!-- Report Sections -->
+            <section id="introduction" class="report-section">
+                <h2>Introduction</h2>
+                <div id="introduction-content"></div>
+            </section>
+
+            <section id="executive-summary" class="report-section">
+                <h2>Executive Summary</h2>
+                <div id="executive-summary-content"></div>
+            </section>
+
+            <section id="mutation-profile" class="report-section">
+                <h2>Mutation Profile</h2>
+                <div id="mutation-profile-content"></div>
+            </section>
+
+            <section id="risk-assessment" class="report-section">
+                <h2>Risk Assessment</h2>
+                <div id="risk-assessment-content"></div>
+            </section>
+
+            <section id="clinical-implications" class="report-section">
+                <h2>Clinical Implications</h2>
+                <div id="clinical-implications-content"></div>
+            </section>
+
+            <section id="lifestyle-recommendations" class="report-section">
+                <h2>Lifestyle Recommendations</h2>
+                <div id="lifestyle-recommendations-content"></div>
+            </section>
+
+            <section id="monitoring-plan" class="report-section">
+                <h2>Monitoring Plan</h2>
+                <div id="monitoring-plan-content"></div>
+            </section>
+
+            <section id="variant-explanations" class="report-section">
+                <h2>Variant Explanations</h2>
+                <div id="variant-explanations-content"></div>
+            </section>
+
+            <section id="gwas-analysis" class="report-section">
+                <h2>GWAS Analysis</h2>
+                <div id="gwas-analysis-content"></div>
+            </section>
+
+            <section id="literature-evidence" class="report-section">
+                <h2>Literature Evidence</h2>
+                <div id="literature-evidence-content"></div>
+            </section>
+
+            <section id="research-opportunities" class="report-section">
+                <h2>Research Opportunities</h2>
+                <div id="research-opportunities-content"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // GENETIC REPORT DATA (TO BE EMBEDDED BY BACKEND)
+        const reportData = null; // Will be replaced with actual JSON data
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            if (reportData) {
+                renderReport(reportData);
+            } else {
+                // Show loading state or error message
+                document.getElementById('loading').textContent = 'No report data available. Data will be embedded by the backend.';
+            }
+            
+            // Initialize navigation
+            initializeNavigation();
+            // Initialize collapsible functionality
+            initializeCollapsibles();
+        });
+        
+        function renderReport(data) {
+            try {
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+                
+                // Show report sections
+                document.querySelectorAll('.report-section').forEach(section => {
+                    section.style.display = 'block';
+                });
+                
+                // Render each section with error handling
+                if (data.introduction) renderIntroduction(data.introduction);
+                if (data.executive_summary) renderExecutiveSummary(data.executive_summary);
+                if (data.mutation_profile) renderMutationProfile(data.mutation_profile);
+                if (data.risk_assessment) renderRiskAssessment(data.risk_assessment);
+                if (data.clinical_implications) renderClinicalImplications(data.clinical_implications);
+                if (data.lifestyle_recommendations) renderLifestyleRecommendations(data.lifestyle_recommendations);
+                if (data.monitoring_plan) renderMonitoringPlan(data.monitoring_plan);
+                if (data.variant_explanations) renderVariantExplanations(data.variant_explanations);
+                if (data.gwas_analysis) renderGWASAnalysis(data.gwas_analysis);
+                if (data.literature_evidence) renderLiteratureEvidence(data.literature_evidence);
+                if (data.research_opportunities) renderResearchOpportunities(data.research_opportunities);
+                
+                // Initialize active section highlighting
+                initializeActiveSection();
+            } catch (error) {
+                console.error('Error rendering report:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> There was a problem rendering the report. Please check the data format.
+                    </div>
+                `;
+            }
+        }
+        
+        // RENDERING FUNCTIONS
+        
+        function renderIntroduction(data) {
+            const container = document.getElementById('introduction-content');
+            if (!container || !data) return;
+            
+            let html = '';
+            
+            if (data.overview) {
+                html += `<div class="card">
+                    <h3>Overview</h3>
+                    <p>${data.overview}</p>
+                </div>`;
+            }
+            
+            if (data.analytical_approach) {
+                html += `<div class="card">
+                    <h3>Analytical Approach</h3>`;
+                    
+                if (data.analytical_approach.methodology) {
+                    html += `<h4>Methodology</h4>
+                    <p>${data.analytical_approach.methodology}</p>`;
+                }
+                
+                if (data.analytical_approach.data_sources && data.analytical_approach.data_sources.length > 0) {
+                    html += `<h4>Data Sources</h4><ul>`;
+                    data.analytical_approach.data_sources.forEach(source => {
+                        html += `<li>${source}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            if (data.scope_of_analysis) {
+                html += `<div class="card">
+                    <h3>Scope of Analysis</h3>`;
+                    
+                if (data.scope_of_analysis.coverage) {
+                    html += `<p>${data.scope_of_analysis.coverage}</p>`;
+                }
+                
+                if (data.scope_of_analysis.genes_examined && data.scope_of_analysis.genes_examined.length > 0) {
+                    html += `<h4>Genes Examined</h4><div>`;
+                    data.scope_of_analysis.genes_examined.forEach(gene => {
+                        html += `<span class="gene-tag">${gene}</span>`;
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            if (data.important_disclaimers && data.important_disclaimers.length > 0) {
+                html += `<div class="card">
+                    <h3>Important Disclaimers</h3>`;
+                data.important_disclaimers.forEach(disclaimer => {
+                    html += `<div class="alert alert-info">
+                        <h4>${disclaimer.category}</h4>
+                        <p>${disclaimer.content}</p>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function renderExecutiveSummary(data) {
+            const container = document.getElementById('executive-summary-content');
+            if (!container || !data) return;
+            
+            let html = '';
+            
+            if (data.summary_statement) {
+                html += `<div class="alert alert-info">
+                    <h3>Summary Statement</h3>
+                    <p>${data.summary_statement}</p>
+                </div>`;
+            }
+            
+            if (data.key_protein_mutations && data.key_protein_mutations.length > 0) {
+                html += `<div class="card">
+                    <h3>Key Protein Mutations</h3>`;
+                    
+                data.key_protein_mutations.forEach(mutation => {
+                    const riskClass = getRiskBadgeClass(mutation.overall_affect);
+                    html += `<div class="card ${getPriorityClass('high')}">
+                        <div class="card-header">
+                            <div>
+                                <h4 class="card-title">${mutation.protein}</h4>
+                                <span class="badge ${riskClass}">${mutation.overall_affect || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        <p><strong>Mutation:</strong> ${mutation.specific_mutation}</p>
+                        <p><strong>Clinical Significance:</strong> ${mutation.clinical_significance}</p>`;
+                        
+                    if (mutation.associated_diseases && mutation.associated_diseases.length > 0) {
+                        html += `<p><strong>Associated Diseases:</strong></p><ul>`;
+                        mutation.associated_diseases.forEach(disease => {
+                            html += `<li>${disease}</li>`;
+                        });
+                        html += `</ul>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            if (data.primary_recommendations && data.primary_recommendations.length > 0) {
+                html += `<div class="card">
+                    <h3>Primary Recommendations</h3>`;
+                    
+                data.primary_recommendations.forEach(rec => {
+                    const priorityClass = getPriorityClass(rec.priority);
+                    html += `<div class="card ${priorityClass}">
+                        <div class="card-header">
+                            <div>
+                                <span class="badge badge-${rec.priority === 'high' ? 'risk-high' : rec.priority === 'medium' ? 'risk-medium' : 'risk-low'}">${rec.priority} Priority</span>
+                                <span class="badge badge-neutral">${rec.type}</span>
+                            </div>
+                        </div>
+                        <p>${rec.recommendation}</p>
+                        ${rec.protein_basis ? `<p><strong>Based on:</strong> ${rec.protein_basis}</p>` : ''}
+                    </div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            if (data.risk_highlights) {
+                html += `<div class="card">
+                    <h3>Risk Highlights</h3>
+                    ${data.risk_highlights.summary ? `<p>${data.risk_highlights.summary}</p>` : ''}`;
+                    
+                if (data.risk_highlights.high_risk_diseases && data.risk_highlights.high_risk_diseases.length > 0) {
+                    html += `<h4>High Risk Diseases</h4>`;
+                    data.risk_highlights.high_risk_diseases.forEach(disease => {
+                        const riskClass = getRiskBadgeClass(disease.overall_affect);
+                        html += `<div class="card priority-high">
+                            <div class="card-header">
+                                <div>
+                                    <h4 class="card-title">${disease.disease}</h4>
+                                    <span class="badge ${riskClass}">${disease.overall_affect || 'Unknown'}</span>
+                                </div>
+                            </div>
+                            <p><strong>Risk Level:</strong> ${disease.risk_level}</p>
+                            ${disease.associated_proteins && disease.associated_proteins.length > 0 ? `<p><strong>Associated Proteins:</strong> ${disease.associated_proteins.join(', ')}</p>` : ''}
+                            ${disease.pathway_effects ? `<p><strong>Pathway Effects:</strong> ${disease.pathway_effects}</p>` : ''}
+                        </div>`;
+                    });
+                }
+                
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function renderMutationProfile(data) {
+            const container = document.getElementById('mutation-profile-content');
+            if (!container || !data) return;
+            
+            let html = '';
+            
+            if (data.executive_summary) {
+                html += `<div class="alert alert-info">
+                    <p>${data.executive_summary}</p>
+                </div>`;
+            }
+            
+            if (data.detailed_protein_analysis && data.detailed_protein_analysis.length > 0) {
+                html += `<div class="card">
+                    <h3>Detailed Protein Analysis</h3>`;
+                    
+                data.detailed_protein_analysis.forEach((protein, index) => {
+                    html += `<div class="collapsible">
+                        <div class="collapsible-header" data-target="protein-${index}">
+                            <h4 class="collapsible-title">${protein.protein}</h4>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content" id="protein-${index}">
+                            <p><strong>Normal Function:</strong> ${protein.normal_function}</p>
+                            ${protein.mutation_details ? `<p><strong>Mutation Details:</strong> ${protein.mutation_details}</p>` : ''}
+                            ${protein.functional_impact ? `<p><strong>Functional Impact:</strong> ${protein.functional_impact}</p>` : ''}
+                            ${protein.clinical_significance ? `<p><strong>Clinical Significance:</strong> ${protein.clinical_significance}</p>` : ''}
+                            ${protein.pathway_effects ? `<p><strong>Pathway Effects:</strong> ${protein.pathway_effects}</p>` : ''}`;
+                            
+                    if (protein.disease_associations && protein.disease_associations.length > 0) {
+                        html += `<p><strong>Disease Associations:</strong></p><ul>`;
+                        protein.disease_associations.forEach(disease => {
+                            html += `<li>${disease}</li>`;
+                        });
+                        html += `</ul>`;
+                    }
+                    
+                    if (protein.evidence_level) {
+                        const evidenceClass = getEvidenceBadgeClass(protein.evidence_level);
+                        html += `<p><strong>Evidence Level:</strong> <span class="badge ${evidenceClass}">${protein.evidence_level}</span></p>`;
+                    }
+                    
+                    html += `</div></div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function renderRiskAssessment(data) {
+            const container = document.getElementById('risk-assessment-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Risk assessment data structure not fully defined. This section will display risk analysis when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderClinicalImplications(data) {
+            const container = document.getElementById('clinical-implications-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Clinical implications data structure not fully defined. This section will display clinical recommendations when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderLifestyleRecommendations(data) {
+            const container = document.getElementById('lifestyle-recommendations-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Lifestyle recommendations data structure not fully defined. This section will display personalized recommendations when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderMonitoringPlan(data) {
+            const container = document.getElementById('monitoring-plan-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Monitoring plan data structure not fully defined. This section will display monitoring protocols when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderVariantExplanations(data) {
+            const container = document.getElementById('variant-explanations-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Variant explanations data structure not fully defined. This section will display detailed variant information when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderGWASAnalysis(data) {
+            const container = document.getElementById('gwas-analysis-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>GWAS analysis data structure not fully defined. This section will display genome-wide association findings when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderLiteratureEvidence(data) {
+            const container = document.getElementById('literature-evidence-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Literature evidence data structure not fully defined. This section will display supporting research when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderResearchOpportunities(data) {
+            const container = document.getElementById('research-opportunities-content');
+            if (!container || !data) return;
+            
+            let html = `<div class="alert alert-info">
+                <p>Research opportunities data structure not fully defined. This section will display relevant research participation options when data is available.</p>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        // HELPER FUNCTIONS
+        
+        function getRiskBadgeClass(riskLevel) {
+            switch(riskLevel?.toLowerCase()) {
+                case 'risk-increasing': return 'badge-risk-high';
+                case 'protective': return 'badge-protective';
+                case 'neutral': return 'badge-neutral';
+                default: return 'badge-neutral';
+            }
+        }
+        
+        function getPriorityClass(priority) {
+            switch(priority?.toLowerCase()) {
+                case 'high': return 'priority-high';
+                case 'medium': return 'priority-medium';
+                case 'low': return 'priority-low';
+                default: return '';
+            }
+        }
+        
+        function getEvidenceBadgeClass(evidence) {
+            switch(evidence?.toLowerCase()) {
+                case 'well-established': return 'badge-protective';
+                case 'moderate': return 'badge-risk-low';
+                case 'emerging': return 'badge-risk-medium';
+                case 'limited': return 'badge-neutral';
+                default: return 'badge-neutral';
+            }
+        }
+        
+        // NAVIGATION AND INTERACTION FUNCTIONS
+        
+        function initializeNavigation() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-section');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                        
+                        // Update active state
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        function initializeCollapsibles() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.collapsible-header')) {
+                    const header = e.target.closest('.collapsible-header');
+                    const targetId = header.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
+                    const icon = header.querySelector('.collapsible-icon');
+                    
+                    if (content && icon) {
+                        content.classList.toggle('expanded');
+                        icon.classList.toggle('expanded');
+                    }
+                }
+            });
+        }
+        
+        function initializeActiveSection() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -80% 0px',
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const targetId = entry.target.id;
+                        const navLink = document.querySelector(`[data-section="${targetId}"]`);
+                        if (navLink) {
+                            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                            navLink.classList.add('active');
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.report-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+    </script>
+</body>
+</html>

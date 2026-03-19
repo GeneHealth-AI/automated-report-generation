@@ -1,0 +1,387 @@
+<div class="report-block mutation-profile-block" data-block-type="mutation_profile" id="genetic-profile-block">
+    <div class="block-header">
+        <h2 style="color: var(--primary-blue);">{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% set content = block.content.genetic_profile if block.content.genetic_profile else block.content %}
+
+        {% if content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if content.summary or content.genetic_risk_summary %}
+        <div class="profile-technical-summary">
+            <div class="summary-header">
+                <i class="fas fa-file-medical-alt"></i>
+                <span>Technical Interpretation Summary</span>
+            </div>
+            <p>{{ content.summary or content.genetic_risk_summary }}</p>
+        </div>
+        {% endif %}
+
+        {% set mutations_data = content.genetic_variants or content.genetic_variants_affecting_proteins or
+        content.mutations or [] %}
+
+        {% if not mutations_data %}
+        <div class="empty-state">
+            <p>No prioritized clinical variants identified in the current analysis scope.</p>
+        </div>
+        {% else %}
+
+        <div class="technical-controls">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="protein-search" placeholder="Search by Gene, Variant, or Condition..."
+                    onkeyup="filterProteins()">
+            </div>
+            <div class="technical-stats">
+                Displaying <span id="visible-count">{{ mutations_data|length }}</span> of {{ mutations_data|length }}
+                clinical variants
+            </div>
+        </div>
+
+        <div class="variants-accordion" id="proteins-list">
+            {% for mutation in mutations_data %}
+            {% set gene_name = mutation.gene or mutation.affected_protein or mutation.protein or 'Unknown' %}
+            {% set variant_desc = mutation.variant or mutation.variation or mutation.variant_details or '' %}
+            {% set significance = mutation.clinical_significance or mutation.functional_change or
+            mutation.functional_impact or 'VUS' %}
+            {% set diseases = mutation.associated_diseases or mutation.disease_association or [] %}
+
+            <div class="variant-item active" data-protein="{{ gene_name|lower }}"
+                data-variant="{{ variant_desc|lower }}"
+                data-diseases="{{ diseases|join(' ')|lower if diseases is not string else diseases|lower }}">
+                <div class="variant-header" onclick="toggleVariantAccordion(this)">
+                    <div class="header-left">
+                        <span class="gene-symbol">{{ gene_name }}</span>
+                        <span class="variant-id">{{ variant_desc }}</span>
+                    </div>
+                    <div class="header-right">
+                        {% if mutation.clinical_significance %}
+                        <span
+                            class="significance-badge sig-{{ mutation.clinical_significance.lower().replace(' ', '-') }}">
+                            {{ mutation.clinical_significance }}
+                        </span>
+                        {% else %}
+                        <span class="significance-badge sig-{{ significance.lower().replace(' ', '-') }}">
+                            {{ significance }}
+                        </span>
+                        {% endif %}
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                </div>
+                <div class="variant-body">
+                    <div class="body-inner">
+                        <!-- Consumer View -->
+                        <div class="consumer-insight">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Consumer Insight:</strong> {{ mutation.mutation_description or 'This variant affects
+                            how the ' ~ gene_name ~ ' protein functions.' }}
+                        </div>
+
+                        {% if mutation.risk_tier and mutation.risk_tier != 'Neutral' %}
+                        <div class="risk-meter-container">
+                            <div class="risk-meter-labels">
+                                <span>Low Risk</span>
+                                <span>{{ mutation.risk_tier }}</span>
+                                <span>High Risk</span>
+                            </div>
+                            <div class="risk-meter-bar">
+                                {% set fill_pct = 80 if mutation.risk_tier == 'High' else 50 if mutation.risk_tier ==
+                                'Moderate' else 20 %}
+                                {% set fill_class = 'risk-fill-high' if mutation.risk_tier == 'High' else
+                                'risk-fill-med' if mutation.risk_tier == 'Moderate' else 'risk-fill-low' %}
+                                <div class="risk-meter-fill {{ fill_class }}" style="width: {{ fill_pct }}%;"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if mutation.absolute_risk_range %}
+                        <div class="abs-risk-callout">
+                            <div class="abs-risk-value">{{ mutation.absolute_risk_range }}</div>
+                            <div class="abs-risk-info">
+                                <strong>Lifetime Absolute Risk</strong><br>
+                                Population average: {{ mutation.population_risk or 'Varies' }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="detail-grid">
+                            <div class="detail-col">
+                                <label>Clinical Interpretation</label>
+                                <p>{{ mutation.clinical_impact or mutation.interpretation or mutation.functional_impact
+                                    or 'Clinical summary pending.' }}</p>
+                            </div>
+                            <div class="detail-col">
+                                <label>Technical Detail</label>
+                                <div class="evidence-meter">
+                                    {% set strength = mutation.evidence_strength or 'Emerging' %}
+                                    {% set dots = 3 if strength == 'Strong' else 2 if strength == 'Moderate' else 1 %}
+                                    {% for i in range(3) %}
+                                    <div class="evidence-dot {{ 'active' if i < dots else '' }}"></div>
+                                    {% endfor %}
+                                    <span class="evidence-label">{{ strength }} Evidence</span>
+                                </div>
+                                <p style="font-size: 0.8rem; margin-top: 8px;">
+                                    <strong>Score:</strong> {{ "%.2f"|format(mutation.score|float) if mutation.score
+                                    else 'N/A' }} |
+                                    <strong>Pathogenicity:</strong> {{ mutation.clinical_significance or 'VUS' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Clinician Section -->
+                        <div class="clinician-appendix">
+                            <div class="clinician-title">
+                                <i class="fas fa-stethoscope"></i> Clinical Context
+                            </div>
+                            <div class="detail-grid">
+                                <div class="detail-col">
+                                    <label>Associated Phenotypes</label>
+                                    <p>
+                                        {% if diseases is string %}
+                                        {{ diseases }}
+                                        {% else %}
+                                        {{ diseases|join('; ') or 'None currently documented.' }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                {% if mutation.inheritance_mode %}
+                                <div class="detail-col">
+                                    <label>Inheritance Pattern</label>
+                                    <p>{{ mutation.inheritance_mode }}</p>
+                                </div>
+                                {% endif %}
+                                {% if mutation.evidence_sources %}
+                                <div class="detail-col">
+                                    <label>Evidence Sources</label>
+                                    <p style="font-size: 0.75rem;">{{ mutation.evidence_sources|join(', ') if
+                                        mutation.evidence_sources is list else mutation.evidence_sources }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .profile-technical-summary {
+        background: #f8fafc;
+        border-left: 4px solid #0369a1;
+        padding: 1.5rem;
+        border-radius: 0 16px 16px 0;
+        margin-bottom: 2.5rem;
+    }
+
+    .summary-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        color: #0369a1;
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .technical-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .search-wrapper {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+    .technical-stats {
+        font-size: 0.85rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .variants-accordion {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .variant-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .variant-header {
+        padding: 1rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        background: #ffffff;
+        transition: background 0.2s;
+    }
+
+    .variant-header:hover {
+        background: #f8fafc;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .gene-symbol {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #0f172a;
+    }
+
+    .variant-id {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .significance-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 99px;
+        text-transform: uppercase;
+    }
+
+    .sig-pathogenic {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .sig-likely-pathogenic {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    .sig-vus,
+    .sig-uncertain {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .sig-benign,
+    .sig-likely-benign {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .toggle-icon {
+        color: #94a3b8;
+        transition: transform 0.3s;
+        margin-left: 1rem;
+    }
+
+    .variant-item.active .toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .variant-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+
+    .variant-item.active .variant-body {
+        max-height: 1000px;
+    }
+
+    .body-inner {
+        padding: 1.25rem;
+        border-top: 1px solid #e2e8f0;
+        background: #fafafa;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .detail-col label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-col p {
+        font-size: 0.9rem;
+        color: #334155;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #94a3b8;
+    }
+</style>
+
+<script>
+    function toggleVariantAccordion(header) {
+        const item = header.parentElement;
+        item.classList.toggle('active');
+    }
+
+    function filterProteins() {
+        const term = document.getElementById('protein-search').value.toLowerCase();
+        const items = document.querySelectorAll('.variant-item');
+        let count = 0;
+        items.forEach(item => {
+            const text = (item.dataset.protein + ' ' + item.dataset.variant + ' ' + item.dataset.diseases).toLowerCase();
+            if (text.includes(term)) {
+                item.style.display = 'block';
+                count++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        document.getElementById('visible-count').textContent = count;
+    }
+</script>

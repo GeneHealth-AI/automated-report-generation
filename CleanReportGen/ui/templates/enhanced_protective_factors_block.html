@@ -1,0 +1,532 @@
+<!-- Enhanced Protective Factors Block with Dynamic Rendering -->
+<div class="protective-factors-block" data-block-type="protective_factors" data-condition="{{ context.condition }}">
+
+    <div class="block-header">
+        <h2>{{ template_helpers.get_section_header('protective_factors', context) }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        <!-- Section Summary -->
+        <div class="assessment-intro">
+            <p>{{ template_helpers.get_section_summary(context, 'protective_factors') }}</p>
+        </div>
+
+        <!-- Overall Protection Banner -->
+        {% if block.content.overall_protection %}
+        <div class="protection-hero-banner protection-{{ block.content.overall_protection }}">
+            <div class="protection-hero-content">
+                <div class="protection-hero-label">Assessed Genetic Protection</div>
+                <div class="protection-hero-value">{{ block.content.overall_protection.title() }} <span>Level</span>
+                </div>
+                {% if block.content.confidence_level %}
+                <div class="protection-hero-confidence">Confidence: {{ block.content.confidence_level }}</div>
+                {% endif %}
+            </div>
+            {% if block.content.protection_percentage %}
+            <div class="protection-hero-pct">
+                <div class="pct-val">{{ block.content.protection_percentage }}</div>
+                <div class="pct-label">Factor</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Conditional Protective Content -->
+        {% if template_helpers.should_show_section('protective_factors', context) %}
+
+        <!-- Protective Variants -->
+        {% if context.protective_variants %}
+        <div class="assessment-subsection">
+            <div class="subsection-title">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Primary Protective Variants</h3>
+            </div>
+            <div class="assessment-variant-grid">
+                {% for variant_data in template_helpers.get_variant_display_data(context.protective_variants,
+                'protective_factors') %}
+                <div class="protective-variant-card variant-{{ variant_data.rsid }}">
+                    <div class="vcard-header">
+                        <div class="vcard-gene">{{ variant_data.gene }}</div>
+                        <div class="vcard-rsid">{{ variant_data.rsid }}</div>
+                    </div>
+                    <div class="vcard-body">
+                        <div class="vcard-metric-row">
+                            <div class="vcard-metric">
+                                <span class="m-label">Benefit</span>
+                                <span class="m-val benefit-tag">{{ variant_data.effect_direction_display }}</span>
+                            </div>
+                            <div class="vcard-metric">
+                                <span class="m-label">Magnitude</span>
+                                <span
+                                    class="m-val protection-{{ 'high' if variant_data.effect_magnitude > 2.0 else 'medium' if variant_data.effect_magnitude > 1.5 else 'low' }}">
+                                    {{ "%.2f"|format(variant_data.effect_magnitude) }}x
+                                </span>
+                            </div>
+                        </div>
+                        <p class="vcard-desc">{{ variant_data.description }}</p>
+                        <div class="vcard-footer">
+                            <span class="conf-badge conf-{{ variant_data.confidence_level }}">
+                                {{ variant_data.confidence_display }} Confidence
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Interpretation -->
+        {% if block.content.protection_summary %}
+        <div class="assessment-subsection">
+            <div class="subsection-title">
+                <i class="fas fa-chart-line"></i>
+                <h3>Genetic Interpretation</h3>
+            </div>
+            <div class="interpretation-card">
+                <p>{{ block.content.protection_summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Protective Mechanisms -->
+        {% if block.content.protective_mechanisms %}
+        <div class="assessment-subsection">
+            <div class="subsection-title">
+                <i class="fas fa-cogs"></i>
+                <h3>Protective Mechanisms</h3>
+            </div>
+            <div class="mechanisms-flex-grid">
+                {% for mechanism in block.content.protective_mechanisms %}
+                <div class="mechanism-pill">
+                    <div class="pill-main">
+                        <span class="mech-name">{{ mechanism.mechanism_type }}</span>
+                        <span class="mech-strength-tag strength-{{ mechanism.strength }}">{{ mechanism.strength
+                            }}</span>
+                    </div>
+                    <div class="pill-details">
+                        <p>{{ mechanism.description }}</p>
+                        {% if mechanism.genes_involved %}
+                        <div class="mech-genes">Included genes: {{ mechanism.genes_involved|join(', ') }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Enhancement Opportunities -->
+        {% if block.content.enhancement_opportunities %}
+        <div class="assessment-subsection">
+            <div class="subsection-title">
+                <i class="fas fa-arrow-up"></i>
+                <h3>Enhancement Opportunities</h3>
+            </div>
+            <div class="enhancement-list-card">
+                <p>Synergistic lifestyle strategies to leverage your genetic protective profile:</p>
+                <ul class="styled-list">
+                    {% for opportunity in block.content.enhancement_opportunities %}
+                    <li>{{ opportunity }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Fallback -->
+        {% set fallback = template_helpers.get_fallback_content('protective_factors', context.condition) %}
+        <div class="fallback-container">
+            <div class="fallback-icon"><i class="fas fa-info-circle"></i></div>
+            <h3>{{ fallback.title }}</h3>
+            <p>{{ fallback.message }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Priority Indicator -->
+        {% if template_helpers.has_high_priority_content(context) %}
+        <div class="priority-callout protective-theme">
+            <i class="fas fa-star"></i>
+            <div class="callout-text">
+                <strong>Notable Findings:</strong> Your profile exhibits exceptional protective factors. Clinical
+                management should focus on preserving and augmenting these inherent biological defenses.
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .protective-factors-block {
+        color: var(--text-main);
+    }
+
+    .protective-factors-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .assessment-intro {
+        font-size: var(--text-lg);
+        color: var(--text-muted);
+        margin-bottom: var(--space-xl);
+        border-left: 4px solid var(--accent-blue);
+        padding-left: 20px;
+        line-height: var(--line-height-loose);
+    }
+
+    /* Hero Banner */
+    .protection-hero-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 40px;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 60px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 1px solid #bbf7d0;
+    }
+
+    .protection-hero-banner.protection-high .protection-hero-value {
+        color: var(--success-green);
+    }
+
+    .protection-hero-banner.protection-moderate .protection-hero-value {
+        color: #166534;
+    }
+
+    .protection-hero-banner.protection-low .protection-hero-value {
+        color: #3f6212;
+    }
+
+    .protection-hero-label {
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: var(--font-weight-bold);
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .protection-hero-value {
+        font-size: 48px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 12px;
+    }
+
+    .protection-hero-value span {
+        font-weight: 400;
+        font-size: 32px;
+        opacity: 0.6;
+    }
+
+    .protection-hero-confidence {
+        font-size: var(--text-sm);
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    .protection-hero-pct {
+        text-align: right;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 16px 24px;
+        border-radius: var(--radius-xl);
+        backdrop-filter: blur(4px);
+    }
+
+    .pct-val {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-heading);
+    }
+
+    .pct-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    /* Subsections */
+    .assessment-subsection {
+        margin-bottom: 60px;
+    }
+
+    .subsection-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        color: var(--text-heading);
+    }
+
+    .subsection-title i {
+        color: var(--primary-blue);
+        font-size: 20px;
+    }
+
+    .subsection-title h3 {
+        margin: 0;
+        font-size: var(--text-xl);
+        font-weight: var(--font-weight-bold);
+    }
+
+    /* Variant Cards */
+    .assessment-variant-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .protective-variant-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        border-left: 4px solid var(--success-green);
+    }
+
+    .protective-variant-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .vcard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--bg);
+    }
+
+    .vcard-gene {
+        font-weight: 800;
+        font-size: var(--text-lg);
+        color: var(--text-heading);
+    }
+
+    .vcard-rsid {
+        font-size: var(--text-xs);
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-family: monospace;
+    }
+
+    .vcard-metric-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 16px;
+    }
+
+    .vcard-metric {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .m-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .m-val {
+        font-weight: 700;
+        font-size: var(--text-sm);
+    }
+
+    .protection-high {
+        color: var(--success-green);
+    }
+
+    .protection-medium {
+        color: #166534;
+    }
+
+    .protection-low {
+        color: #3f6212;
+    }
+
+    .vcard-desc {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    .conf-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        text-transform: uppercase;
+    }
+
+    .conf-high {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .conf-moderate {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .conf-low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Interpretation */
+    .interpretation-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+        line-height: 1.8;
+    }
+
+    /* Mechanisms */
+    .mechanisms-flex-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+    }
+
+    .mechanism-pill {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .pill-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .mech-name {
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .mech-strength-tag {
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--bg);
+        color: var(--text-muted);
+    }
+
+    .strength-high {
+        color: var(--success-green);
+        background: #dcfce7;
+    }
+
+    .pill-details p {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        margin-bottom: 12px;
+    }
+
+    .mech-genes {
+        font-size: 11px;
+        color: var(--primary-blue);
+        font-weight: 500;
+    }
+
+    /* Enhancement Opportunities */
+    .enhancement-list-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .styled-list {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+    }
+
+    .styled-list li {
+        padding-left: 28px;
+        position: relative;
+        font-size: var(--text-sm);
+        color: var(--text-main);
+    }
+
+    .styled-list li::before {
+        content: "\f058";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: var(--success-green);
+    }
+
+    /* Fallback */
+    .fallback-container {
+        text-align: center;
+        padding: 60px;
+        background: var(--bg);
+        border-radius: var(--radius-2xl);
+        border: 2px dashed var(--border-light);
+    }
+
+    .fallback-icon {
+        font-size: 48px;
+        color: var(--primary-blue);
+        margin-bottom: 20px;
+    }
+
+    /* Priority Callout */
+    .priority-callout {
+        background: #f0fdf4;
+        border: 1px solid #dcfce7;
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        color: #166534;
+        margin-top: 40px;
+    }
+
+    .priority-callout i {
+        font-size: 24px;
+        color: var(--success-green);
+    }
+
+    .callout-text {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+    }
+</style>

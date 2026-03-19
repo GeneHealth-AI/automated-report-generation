@@ -1,0 +1,1 @@
+This is the data block. Having a place in this directory is purely sumboliic as the data block is made for every report and is not presented as a block.

@@ -1,0 +1,220 @@
+<div class="report-block clinical-implications-block" data-block-type="clinical_implications">
+    <div class="block-header">
+        <h2 style="color: var(--primary-blue);">{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.risk_increasing_implications and
+        block.content.risk_increasing_implications.protein_specific_treatments %}
+        <div class="clinical-section">
+            <h3><i class="fas fa-stethoscope"></i> Clinical Management for Risk Variants</h3>
+            <div class="considerations-grid">
+                {% for treatment in block.content.risk_increasing_implications.protein_specific_treatments %}
+                <div class="consideration-card">
+                    <div class="consideration-title">{{ treatment.protein }}</div>
+                    <div class="consideration-text">
+                        <strong>Associated Diseases:</strong> {{ treatment.associated_diseases | join(', ') }}<br><br>
+                        {{ treatment.clinical_management }}
+                    </div>
+                    {% if treatment.targeted_interventions %}
+                    <div class="med-notes" style="margin-top: 0.75rem;"><strong>Interventions:</strong> {{
+                        treatment.targeted_interventions }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.risk_increasing_implications and
+        block.content.risk_increasing_implications.risk_management_screening %}
+        <div class="clinical-section">
+            <h3><i class="fas fa-search-plus"></i> Screening Recommendations</h3>
+            <div class="screening-grid">
+                {% for screening in block.content.risk_increasing_implications.risk_management_screening %}
+                <div class="screening-card">
+                    <div class="screening-test">{{ screening.disease }}</div>
+                    <div class="screening-detail"><strong>Test:</strong> {{ screening.screening_test }}</div>
+                    <div class="screening-detail"><strong>Frequency:</strong> {{ screening.frequency }}</div>
+                    {% if screening.starting_age %}<div class="screening-detail"><strong>Starting Age:</strong> {{
+                        screening.starting_age }}</div>{% endif %}
+                    <div class="screening-rationale"><strong>Rationale:</strong> {{ screening.rationale }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.protective_implications and block.content.protective_implications.protective_advantages %}
+        <div class="clinical-section">
+            <h3><i class="fas fa-shield-alt" style="color: #10b981;"></i> Protective Factors</h3>
+            <div class="considerations-grid">
+                {% for protection in block.content.protective_implications.protective_advantages %}
+                <div class="consideration-card">
+                    <div class="consideration-title">{{ protection.protein }}</div>
+                    <div class="consideration-text">
+                        {% if protection.associated_diseases %}
+                        <strong>Associated Protections:</strong> {{ protection.associated_diseases | join(', ')
+                        }}<br><br>
+                        {% endif %}
+                        {{ protection.description or protection.advantage or '' }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="clinical-note">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>Clinical Note:</strong> These findings are based on a technical genomic analysis. All clinical
+                interventions must be validated by a licensed physician considering the patient's full medical history.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .clinical-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .technical-badge {
+        background: #e0f2fe;
+        color: #0369a1;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 99px;
+        text-transform: uppercase;
+    }
+
+    .considerations-grid,
+    .screening-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .consideration-card,
+    .screening-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .consideration-title,
+    .screening-test {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .consideration-text,
+    .screening-detail,
+    .screening-rationale {
+        font-size: 0.95rem;
+        color: #475569;
+        margin-bottom: 0.25rem;
+    }
+
+    .med-context-box {
+        background: #f1f5f9;
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: #334155;
+    }
+
+    .med-context-box i {
+        font-size: 1.5rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .med-disclaimer-ul {
+        margin: 10px 0 0;
+        padding-left: 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .med-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .med-item {
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .med-name {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .med-purpose,
+    .med-notes {
+        font-size: 0.9rem;
+        color: #475569;
+    }
+
+    .technical-flex {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .misc-list {
+        padding-left: 1.25rem;
+        margin: 0;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+
+    .clinical-note {
+        margin-top: 3rem;
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        padding: 1.25rem;
+        border-radius: 12px;
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: #92400e;
+    }
+
+    .clinical-note i {
+        font-size: 1.25rem;
+        margin-top: 2px;
+    }
+
+    @media (max-width: 768px) {
+        .technical-flex {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

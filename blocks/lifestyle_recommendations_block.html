@@ -1,0 +1,258 @@
+<div class="report-block lifestyle-recommendations-block" data-block-type="lifestyle_recommendations">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.summary %}
+        <div class="lifestyle-hero">
+            <div class="hero-icon"><i class="fas fa-hand-holding-heart"></i></div>
+            <div class="hero-text">
+                <h3>Health &amp; Wellness Summary</h3>
+                <p>{{ block.content.summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="lifestyle-sections-grid">
+            {% if block.content.dietary_focus %}
+            <div class="lifestyle-section">
+                <div class="section-heading">
+                    <i class="fas fa-apple-alt"></i>
+                    <h4>Dietary Strategies</h4>
+                </div>
+                <div class="recommendation-cards">
+                    {% for diet in block.content.dietary_focus %}
+                    <div class="rec-card diet-card">
+                        <div class="rec-title">{{ diet.type }}</div>
+                        <p class="rec-rationale">{{ diet.rationale }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if block.content.activity_recommendations %}
+            <div class="lifestyle-section">
+                <div class="section-heading">
+                    <i class="fas fa-person-running"></i>
+                    <h4>Physical Activity</h4>
+                </div>
+                <div class="recommendation-cards">
+                    {% for activity in block.content.activity_recommendations %}
+                    <div class="rec-card activity-card">
+                        <div class="rec-title">{{ activity.activity }}</div>
+                        <p class="rec-rationale">{{ activity.benefit }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if block.content.environmental_and_habit_changes %}
+        <div class="lifestyle-section habits-section">
+            <div class="section-heading">
+                <i class="fas fa-leaf"></i>
+                <h4>Habits & Environmental Factors</h4>
+            </div>
+            <div class="habits-flex">
+                {% for habit in block.content.environmental_and_habit_changes %}
+                <div class="habit-pill">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ habit }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="lifestyle-footer-callout">
+            <i class="fas fa-info-circle"></i>
+            <div class="callout-content">
+                <strong>Clinician Coordination:</strong> These lifestyle strategies are tailored to your genetic risk
+                profile. Consult with your healthcare provider before implementing significant changes to your regimen.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .lifestyle-recommendations-block {
+        color: var(--text-main);
+    }
+
+    .lifestyle-recommendations-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .lifestyle-hero {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+        border: 1px solid #99f6e4;
+        border-radius: var(--radius-2xl);
+        padding: 32px;
+        display: flex;
+        gap: 24px;
+        margin-bottom: 40px;
+        align-items: center;
+    }
+
+    .hero-icon {
+        width: 64px;
+        height: 64px;
+        background: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: #0d9488;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .hero-text h3 {
+        margin: 0 0 8px 0;
+        font-size: var(--text-xl);
+        color: #0f172a;
+    }
+
+    .hero-text p {
+        margin: 0;
+        color: #374151;
+        line-height: 1.6;
+        font-size: var(--text-base);
+    }
+
+    .lifestyle-sections-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 32px;
+        margin-bottom: 40px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        color: var(--text-heading);
+    }
+
+    .section-heading i {
+        color: var(--primary-blue);
+        font-size: 18px;
+    }
+
+    .section-heading h4 {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .recommendation-cards {
+        display: grid;
+        gap: 16px;
+    }
+
+    .rec-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .rec-card:hover {
+        transform: translateX(4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .rec-title {
+        font-weight: 800;
+        color: var(--text-heading);
+        margin-bottom: 8px;
+        font-size: var(--text-md);
+    }
+
+    .rec-rationale {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .diet-card {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .activity-card {
+        border-left: 4px solid #3b82f6;
+    }
+
+    .habits-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: var(--bg);
+        padding: 24px;
+        border-radius: var(--radius-xl);
+    }
+
+    .habit-pill {
+        background: white;
+        border: 1px solid var(--border-light);
+        padding: 10px 20px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .habit-pill i {
+        color: var(--success-green);
+    }
+
+    .lifestyle-footer-callout {
+        margin-top: 60px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 24px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        color: #475569;
+    }
+
+    .lifestyle-footer-callout i {
+        font-size: 20px;
+        color: var(--primary-blue);
+        margin-top: 2px;
+    }
+
+    .callout-content {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+    }
+
+    .callout-content strong {
+        color: var(--text-heading);
+    }
+</style>

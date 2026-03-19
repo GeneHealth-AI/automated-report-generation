@@ -1,0 +1,38 @@
+# Environment and secrets
+.env
+*.env
+
+# Cache and database
+mutation_cache.db
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.kiro/
+.claude/
+
+# Generated reports (large files)
+*.tsv
+*.log
+reports_storage/
+reports_json/
+np_full_info/
+
+# Testing artifacts
+testing/
+tests/
+archive/
+
+# Terraform
+aws-deployment/terraform/.terraform/
+
+# Temp
+preview_report.html

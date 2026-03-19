@@ -1,0 +1,104 @@
+Prompt: <PROMPT>
+
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive research opportunities section for a precision medicine report based on the following data:
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Protein Diseases: <PROTEIN_DISEASES>
+Specific Conditions: <CONDITIONS>
+Genetic Variants: <VARIANTS>
+Disease Focus: <DISEASEFOCUS>
+Patient Demographics: <DEMOGRAPHICS>
+rsIDs: <VARIANTS>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+If a field is blank ignore it.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a detailed research opportunities section that includes:
+
+1. Research summary providing an overview of current research landscape for the patient's genetic profile and conditions.
+
+2. Relevant clinical trials:
+   - Trial title or focus area
+   - Phase (I, II, III, IV)
+   - What the trial is investigating
+   - Relevant eligibility criteria based on genetic profile
+
+3. Research studies (non-clinical trial research):
+   - Type of study (observational, registry, biobank, etc.)
+   - Focus of the research
+   - Relevance to the patient's genetic profile
+
+4. Emerging therapies in development:
+   - Therapy name or type
+   - Target mechanism
+   - Development timeline
+   - Relevance to patient's conditions
+
+5. Biobank opportunities where patients can contribute samples for research.
+
+Requirements:
+- Search ClinicalTrials.gov for relevant trials
+- Include trials specifically recruiting for genetic variants identified
+- Focus on studies within reasonable geographic reach when possible
+- Include both interventional and observational studies
+- Highlight precision medicine initiatives
+- Consider patient's specific conditions and genetic profile
+- DO NOT HALLUCINATE - only include real, active research opportunities
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "research_opportunities": {
+    "research_landscape_overview": "[Comprehensive paragraph describing the current research landscape for the patient's genetic profile and conditions]",
+    "relevant_clinical_trials": [
+      {
+        "trial_title": "[Trial Title or Focus Area]",
+        "phase": "[Phase I/II/III/IV]",
+        "focus": "[What the trial is investigating]",
+        "eligibility_criteria": "[Relevant eligibility criteria based on genetic profile]",
+        "location_contact": "[If available, trial location or contact information]",
+        "relevance_to_patient": "[Why this trial is relevant to the patient's genetic profile]"
+      }
+    ],
+    "research_studies": [
+      {
+        "study_type": "[Observational/Registry/Biobank/etc.]",
+        "focus": "[What the research is investigating]",
+        "relevance": "[Why this is relevant to the patient's genetic profile]",
+        "participation_details": "[How to participate if applicable]",
+        "genetic_requirements": "[Specific genetic variants or conditions needed]"
+      }
+    ],
+    "emerging_therapies": [
+      {
+        "therapy_name": "[Therapy Name or Type]",
+        "target_mechanism": "[What the therapy targets]",
+        "development_timeline": "[Expected timeline, e.g., 2-5 years]",
+        "relevance": "[How this relates to patient's conditions and genetic profile]",
+        "development_stage": "[Preclinical/Phase I/II/III]"
+      }
+    ],
+    "biobank_registry_opportunities": [
+      {
+        "name": "[Biobank or research registry name]",
+        "description": "[Brief description]",
+        "relevance": "[Why this is relevant to the patient]",
+        "participation_requirements": "[Requirements for participation]"
+      }
+    ],
+    "sources_searched": {
+      "databases": ["ClinicalTrials.gov", "[Database 2]", "[Database 3]"],
+      "institutions": ["[Institution 1]", "[Institution 2]"],
+      "research_networks": ["[Network 1]", "[Network 2]"]
+    }
+  }
+}

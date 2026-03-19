@@ -1,0 +1,15 @@
+# AWS Lambda Requirements for PDF Report Generator
+# These dependencies will be packaged as Lambda layers
+
+# Core PDF generation
+reportlab==4.0.7
+
+# AWS SDK (usually included in Lambda runtime, but specified for completeness)
+boto3>=1.34.0
+botocore>=1.34.0
+
+# JSON processing and utilities
+python-dateutil>=2.8.2
+
+# Optional: For enhanced text processing
+regex>=2023.10.3

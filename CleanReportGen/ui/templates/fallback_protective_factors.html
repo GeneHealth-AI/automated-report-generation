@@ -1,0 +1,270 @@
+<!-- Fallback Protective Factors Template for Edge Cases -->
+<div class="report-block fallback-protective-factors" data-block-type="protective_factors">
+    <div class="block-header">
+        <h2>Protective Factors for {{ context.condition }}</h2>
+        <div class="fallback-indicator">
+            <i class="fas fa-info-circle"></i>
+            <span>Simplified View</span>
+        </div>
+    </div>
+    
+    <div class="block-content">
+        <div class="fallback-content">
+            <!-- Basic Protection Information -->
+            <div class="basic-protection-info">
+                <h3>Genetic Protection Analysis</h3>
+                
+                {% if context.protective_variant_count > 0 %}
+                <div class="protection-summary">
+                    <div class="protection-indicator positive">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>{{ context.protective_variant_count }} genetic variant{{ 's' if context.protective_variant_count != 1 else '' }} associated with protection identified</span>
+                    </div>
+                    
+                    <div class="variant-list">
+                        <h4>Protective Variants:</h4>
+                        <ul>
+                            {% for variant in context.protective_variants %}
+                            <li>
+                                <strong>{{ variant.gene }}</strong> ({{ variant.rsid }}) - 
+                                {{ variant.confidence_level.value }} confidence
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-protective-variants">
+                    <div class="neutral-indicator">
+                        <i class="fas fa-minus-circle"></i>
+                        <span>No specific genetic variants associated with protection against {{ context.condition }} were identified</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Basic Implications -->
+            <div class="basic-implications">
+                <h3>What This Means</h3>
+                <div class="implications-box">
+                    {% if context.protective_variant_count > 0 %}
+                    <p>Your genetic profile shows some protective factors:</p>
+                    <ul>
+                        <li>These variants may provide some natural protection against {{ context.condition }}</li>
+                        <li>Protection is relative and doesn't guarantee immunity</li>
+                        <li>Lifestyle and environmental factors still play important roles</li>
+                        <li>Regular health monitoring remains important</li>
+                    </ul>
+                    {% else %}
+                    <p>No specific protective genetic variants were identified:</p>
+                    <ul>
+                        <li>This doesn't mean you lack protection against {{ context.condition }}</li>
+                        <li>Many protective factors may not yet be discovered</li>
+                        <li>Lifestyle choices can provide significant protection</li>
+                        <li>Environmental factors also influence disease risk</li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Enhancement Opportunities -->
+            {% if context.protective_variant_count > 0 %}
+            <div class="enhancement-opportunities">
+                <h3>Maximizing Your Protective Factors</h3>
+                <div class="opportunities-box">
+                    <p>To make the most of your genetic advantages:</p>
+                    <ul>
+                        <li>Maintain healthy lifestyle practices to support your natural protection</li>
+                        <li>Stay informed about research related to your protective variants</li>
+                        <li>Discuss these findings with your healthcare provider</li>
+                        <li>Consider how this information fits into your overall health strategy</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Limitations Notice -->
+            <div class="limitations-notice">
+                <h4><i class="fas fa-exclamation-triangle"></i> Important Considerations</h4>
+                <div class="notice-content">
+                    <p>Keep in mind:</p>
+                    <ul>
+                        <li>Genetic protection is complex and not fully understood</li>
+                        <li>New protective variants are still being discovered</li>
+                        <li>Individual outcomes depend on many factors beyond genetics</li>
+                        <li>This analysis should complement, not replace, medical advice</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Upgrade Notice -->
+            <div class="upgrade-notice">
+                <div class="upgrade-content">
+                    <i class="fas fa-arrow-up"></i>
+                    <div class="upgrade-text">
+                        <h4>Comprehensive Analysis Available</h4>
+                        <p>A more detailed protective factors analysis with advanced insights may be available. Contact support for more information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.fallback-protective-factors {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f7fafc;
+    margin: 1rem 0;
+}
+
+.fallback-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #edf2f7;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.fallback-content {
+    padding: 1.5rem;
+}
+
+.basic-protection-info {
+    margin-bottom: 2rem;
+}
+
+.protection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.protection-indicator.positive {
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    color: #2f855a;
+}
+
+.neutral-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.variant-list {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.variant-list h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+}
+
+.variant-list ul {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.variant-list li {
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+}
+
+.basic-implications {
+    margin-bottom: 2rem;
+}
+
+.implications-box {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.implications-box ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #4a5568;
+}
+
+.enhancement-opportunities {
+    margin-bottom: 2rem;
+}
+
+.opportunities-box {
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.opportunities-box ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #2f855a;
+}
+
+.limitations-notice {
+    background: #fffaf0;
+    border: 1px solid #fbd38d;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.limitations-notice h4 {
+    margin: 0 0 0.5rem 0;
+    color: #c05621;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notice-content ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #744210;
+}
+
+.upgrade-notice {
+    background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+    border: 1px solid #81e6d9;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.upgrade-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.upgrade-content i {
+    color: #319795;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+}
+
+.upgrade-text h4 {
+    margin: 0 0 0.5rem 0;
+    color: #234e52;
+}
+
+.upgrade-text p {
+    margin: 0;
+    color: #285e61;
+}
+</style>

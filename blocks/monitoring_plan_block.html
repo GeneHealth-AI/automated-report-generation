@@ -1,0 +1,345 @@
+<div class="report-block monitoring-plan-block" data-block-type="monitoring_plan">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.follow_up_schedule %}
+        <div class="monitoring-section">
+            <div class="section-title-row">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Integrative Monitoring Schedule</h3>
+            </div>
+            <div class="premium-timeline">
+                {% for followup in block.content.follow_up_schedule %}
+                <div class="timeline-event">
+                    <div class="event-marker"></div>
+                    <div class="event-content">
+                        <div class="event-header">
+                            <span class="event-time">{{ followup.timepoint }}</span>
+                            <h4>{{ followup.focus }}</h4>
+                        </div>
+                        <ul class="event-actions">
+                            {% for action in followup.actions %}
+                            <li>{{ action }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.warning_signs %}
+        <div class="monitoring-section">
+            <div class="section-title-row">
+                <i class="fas fa-bell-exclamation"></i>
+                <h3>Signs to Watch For</h3>
+            </div>
+            <div class="warning-signs-grid">
+                {% for sign in block.content.warning_signs %}
+                <div class="warning-card-v2">
+                    <div class="w-card-header">
+                        <span class="w-icon"><i class="fas fa-circle-info"></i></span>
+                        <h4>{{ sign.sign }}</h4>
+                    </div>
+                    <div class="w-card-body">
+                        <div class="w-meta"><strong>Clinical Context:</strong> {{ sign.meaning }}</div>
+                        <div class="w-action"><strong>Required Action:</strong> {{ sign.action }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.tracking_tools %}
+        <div class="monitoring-section">
+            <div class="section-title-row">
+                <i class="fas fa-clipboard-check"></i>
+                <h3>Patient-Led Tracking Tools</h3>
+            </div>
+            <div class="tracking-tools-flex">
+                {% for tool in block.content.tracking_tools %}
+                <div class="tracking-pill">
+                    <i class="fas fa-check"></i>
+                    <span>{{ tool }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="monitoring-summary-note">
+            <div class="note-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="note-text">
+                <strong>Staying on Track:</strong> This monitoring plan is designed to help you and your doctor
+                keep an eye on your health over time. Share this plan with your primary care provider so it can
+                be part of your regular check-ups.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .monitoring-plan-block {
+        color: var(--text-main);
+    }
+
+    .monitoring-plan-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .monitoring-section {
+        margin-bottom: 60px;
+    }
+
+    .section-title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        color: var(--text-heading);
+    }
+
+    .section-title-row i {
+        color: var(--primary-blue);
+        font-size: 20px;
+    }
+
+    .section-title-row h3 {
+        margin: 0;
+        font-size: var(--text-xl);
+        font-weight: 700;
+    }
+
+    /* Timeline Styling */
+    .premium-timeline {
+        position: relative;
+        padding-left: 32px;
+        border-left: 2px solid var(--border-light);
+        margin-left: 10px;
+    }
+
+    .timeline-event {
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .timeline-event:last-child {
+        margin-bottom: 0;
+    }
+
+    .event-marker {
+        position: absolute;
+        left: -41px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        border: 4px solid white;
+        box-shadow: 0 0 0 2px var(--primary-blue);
+    }
+
+    .event-content {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .event-header {
+        margin-bottom: 16px;
+    }
+
+    .event-time {
+        font-size: var(--text-xs);
+        font-weight: 800;
+        color: var(--primary-blue);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .event-header h4 {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .event-actions {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+    }
+
+    .event-actions li {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 12px;
+        background: var(--bg);
+        border-radius: var(--radius-md);
+    }
+
+    .event-actions li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--success-green);
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    /* Warning Signs */
+    .warning-signs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 24px;
+    }
+
+    .warning-card-v2 {
+        background: #fffefb;
+        border: 1px solid #fef3c7;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        transition: var(--transition);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .warning-card-v2:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .w-card-header {
+        background: #fffbeb;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 1px solid #fef3c7;
+    }
+
+    .w-icon {
+        width: 40px;
+        height: 40px;
+        background: #fef3c7;
+        color: #d97706;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .w-card-header h4 {
+        margin: 0;
+        font-size: var(--text-md);
+        font-weight: 700;
+        color: #92400e;
+    }
+
+    .w-card-body {
+        padding: 20px;
+    }
+
+    .w-meta {
+        font-size: var(--text-sm);
+        color: var(--text-main);
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .w-action {
+        font-size: var(--text-sm);
+        color: #92400e;
+        background: #fffbeb;
+        padding: 12px;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+    }
+
+    /* Tracking Tools */
+    .tracking-tools-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: var(--bg);
+        padding: 24px;
+        border-radius: var(--radius-xl);
+    }
+
+    .tracking-pill {
+        background: white;
+        border: 1px solid var(--border-light);
+        padding: 10px 20px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--text-heading);
+    }
+
+    .tracking-pill i {
+        color: var(--primary-blue);
+    }
+
+    /* Summary Note */
+    .monitoring-summary-note {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 1px solid #bfdbfe;
+        border-radius: var(--radius-2xl);
+        padding: 32px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .note-icon {
+        width: 56px;
+        height: 56px;
+        background: white;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--primary-blue);
+        flex-shrink: 0;
+        box-shadow: var(--card-shadow);
+    }
+
+    .note-text {
+        font-size: var(--text-base);
+        color: #1e3a8a;
+        line-height: 1.7;
+    }
+
+    .note-text strong {
+        color: #1e40af;
+    }
+</style>

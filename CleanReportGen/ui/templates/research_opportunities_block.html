@@ -1,0 +1,425 @@
+<div class="research-opportunities-block" data-block-type="research_opportunities">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+            {% if block.content.retry_available %}
+            <button class="retry-btn" data-block-type="{{ block.block_type.value }}">Retry Generation</button>
+            {% endif %}
+        </div>
+        {% else %}
+
+        {% if block.content.research_summary %}
+        <div class="res-hero">
+            <div class="res-icon"><i class="fas fa-flask-vial"></i></div>
+            <div class="res-text">
+                <h3>Genomic Research Opportunities</h3>
+                <p>{{ block.content.research_summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.clinical_trials %}
+        <div class="res-section">
+            <div class="res-section-header">
+                <i class="fas fa-clipboard-list"></i>
+                <h4>Integrative Clinical Trials</h4>
+            </div>
+            <div class="trials-grid">
+                {% for trial in block.content.clinical_trials %}
+                <div class="trial-card-v2">
+                    <div class="trial-header">
+                        <span class="phase-badge phase-{{ trial.phase.lower().replace(' ', '-') }}">{{ trial.phase
+                            }}</span>
+                        <h4>{{ trial.title }}</h4>
+                    </div>
+                    <div class="trial-body">
+                        <div class="trial-meta-item">
+                            <strong>Mechanism Focus:</strong> {{ trial.focus }}
+                        </div>
+                        <div class="trial-meta-item">
+                            <strong>Specific Eligibility:</strong> {{ trial.eligibility }}
+                        </div>
+                    </div>
+                    <div class="trial-footer">
+                        <small>Verify enrollment status with study coordinators.</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.emerging_therapies %}
+        <div class="res-section">
+            <div class="res-section-header">
+                <i class="fas fa-rocket"></i>
+                <h4>Emerging Therapeutic Pipeline</h4>
+            </div>
+            <div class="therapies-container">
+                {% for therapy in block.content.emerging_therapies %}
+                <div class="therapy-card-v2">
+                    <div class="therapy-top">
+                        <span class="therapy-title">{{ therapy.therapy }}</span>
+                        <span class="therapy-timeline">{{ therapy.timeline }}</span>
+                    </div>
+                    <div class="therapy-info">
+                        <p><strong>Clinical Target:</strong> {{ therapy.target }}</p>
+                        <p><strong>Genomic Relevance:</strong> {{ therapy.relevance }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="engagement-container">
+            <div class="engagement-title">
+                <i class="fas fa-handshake-simple"></i>
+                <h3>Navigating Research Engagement</h3>
+            </div>
+            <div class="engagement-grid">
+                <div class="eng-card">
+                    <h5>Identification</h5>
+                    <ul>
+                        <li>ClinicalTrials.gov indexes</li>
+                        <li>Genetic counselor consultations</li>
+                        <li>Advocacy organization referrals</li>
+                    </ul>
+                </div>
+                <div class="eng-card">
+                    <h5>Evaluation</h5>
+                    <ul>
+                        <li>Benefit-risk assessment</li>
+                        <li>Duration of commitment</li>
+                        <li>Data sharing protocols</li>
+                    </ul>
+                </div>
+                <div class="eng-card">
+                    <h5>Verification</h5>
+                    <ul>
+                        <li>Informed consent process</li>
+                        <li>Voluntary participation rights</li>
+                        <li>Ability to withdraw at any time</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="res-footer-disclaimer">
+            <i class="fas fa-circle-exclamation"></i>
+            <div class="dis-text">
+                <strong>Important Notice:</strong> Participation in clinical research is strictly voluntary. Information
+                provided here is for educational purposes and should not be construed as medical advice. Review all
+                study criteria with your primary physician and genetic counselor.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .research-opportunities-block {
+        color: var(--text-main);
+    }
+
+    .research-opportunities-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    .res-section {
+        margin-bottom: 60px;
+    }
+
+    .res-hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        display: flex;
+        gap: 32px;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .res-icon {
+        width: 72px;
+        height: 72px;
+        background: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: var(--primary-blue);
+        box-shadow: var(--card-shadow);
+    }
+
+    .res-text h3 {
+        margin: 0 0 12px 0;
+        font-size: var(--text-xl);
+        color: #0f172a;
+    }
+
+    .res-text p {
+        margin: 0;
+        font-size: var(--text-md);
+        line-height: 1.7;
+        color: #475569;
+    }
+
+    .res-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        color: var(--text-heading);
+    }
+
+    .res-section-header h4 {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .trials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 24px;
+    }
+
+    .trial-card-v2 {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+    }
+
+    .trial-card-v2:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .trial-header {
+        padding: 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .phase-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        margin-bottom: 12px;
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .phase-phase-i {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .phase-phase-ii {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .phase-phase-iii {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .trial-header h4 {
+        margin: 0;
+        font-size: var(--text-md);
+        font-weight: 700;
+        color: var(--text-heading);
+        line-height: 1.4;
+    }
+
+    .trial-body {
+        padding: 24px;
+        flex-grow: 1;
+    }
+
+    .trial-meta-item {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+        margin-bottom: 12px;
+        color: var(--text-muted);
+    }
+
+    .trial-meta-item strong {
+        color: var(--text-heading);
+    }
+
+    .trial-footer {
+        padding: 16px 24px;
+        background: #fff;
+        border-top: 1px solid #f1f5f9;
+        font-size: var(--text-xs);
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    /* Therapies Container */
+    .therapies-container {
+        display: grid;
+        gap: 16px;
+    }
+
+    .therapy-card-v2 {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    .therapy-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .therapy-title {
+        font-weight: 800;
+        font-size: var(--text-md);
+        color: var(--primary-blue);
+    }
+
+    .therapy-timeline {
+        font-size: var(--text-xs);
+        font-weight: 700;
+        background: #f0f9ff;
+        color: var(--primary-blue);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+    }
+
+    .therapy-info {
+        font-size: var(--text-sm);
+        line-height: 1.5;
+        color: var(--text-muted);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .therapy-info p {
+        margin: 0;
+    }
+
+    .therapy-info strong {
+        color: var(--text-heading);
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    /* Engagement Container */
+    .engagement-container {
+        background: #0f172a;
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        color: white;
+        margin-top: 60px;
+    }
+
+    .engagement-title {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .engagement-title i {
+        font-size: 24px;
+        color: #38bdf8;
+    }
+
+    .engagement-title h3 {
+        margin: 0;
+        font-size: var(--text-xl);
+        font-weight: 700;
+    }
+
+    .engagement-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 32px;
+    }
+
+    .eng-card h5 {
+        margin: 0 0 16px 0;
+        font-size: var(--text-md);
+        font-weight: 800;
+        color: #38bdf8;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .eng-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .eng-card li {
+        font-size: var(--text-sm);
+        margin-bottom: 12px;
+        color: #94a3b8;
+        display: flex;
+        gap: 10px;
+    }
+
+    .eng-card li::before {
+        content: "\f105";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #38bdf8;
+    }
+
+    /* Footer Disclaimer */
+    .res-footer-disclaimer {
+        margin-top: 60px;
+        background: #fefce8;
+        border: 1px solid #fef08a;
+        padding: 24px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        color: #854d0e;
+    }
+
+    .res-footer-disclaimer i {
+        font-size: 20px;
+        color: #a16207;
+        margin-top: 2px;
+    }
+
+    .dis-text {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+    }
+</style>

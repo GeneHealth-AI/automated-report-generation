@@ -1,0 +1,47 @@
+# Example Terraform Variables File
+# Copy this file to terraform.tfvars and fill in your values
+
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "prod"
+
+# Project Configuration
+project_name = "genetic-reports"
+
+# VPC Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# ECS Fargate Configuration
+fargate_cpu    = 2048  # 2 vCPUs
+fargate_memory = 4096  # 4 GB
+
+# RDS Configuration
+db_instance_class           = "db.t3.medium"
+db_name                     = "genetic_reports"
+db_username                 = "report_admin"
+db_allocated_storage        = 100
+db_backup_retention_period  = 7
+
+# S3 Configuration (leave empty for auto-generated names)
+input_bucket_name  = ""
+output_bucket_name = ""
+
+# Lambda Configuration
+lambda_memory_size = 512
+lambda_timeout     = 60
+
+# API Keys (IMPORTANT: Update these after deployment using AWS Secrets Manager)
+anthropic_api_key = ""  # Leave empty, update via Secrets Manager
+gemini_api_key    = ""  # Leave empty, update via Secrets Manager
+
+# Monitoring Configuration
+enable_enhanced_monitoring = true
+log_retention_days         = 30
+
+# Additional Tags
+additional_tags = {
+  Department = "Genomics"
+  CostCenter = "Research"
+  Owner      = "Platform-Team"
+}

@@ -1,0 +1,347 @@
+{# Executive Summary Block Display Template #}
+{% set content_text = block.content if block.content is string else block.content.get('text', '') %}
+
+{% if content_text %}
+{# Parse the content into sections #}
+{% set lines = content_text.split('\n') %}
+{% set in_section = None %}
+{% set sections = {} %}
+{% set current_content = [] %}
+
+{# Manual parsing logic #}
+{% for line in lines %}
+{% if line.strip().startswith('**') and line.strip().endswith('**') and '**KEY PROTEIN MUTATIONS' in line %}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+{% set in_section = 'key_mutations' %}
+{% set current_content = [] %}
+{% elif line.strip().startswith('**') and line.strip().endswith('**') and '**VARIANT SUMMARY' in line %}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+{% set in_section = 'variant_summary' %}
+{% set current_content = [] %}
+{% elif line.strip().startswith('**') and line.strip().endswith('**') and '**PRIMARY RECOMMENDATIONS' in line %}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+{% set in_section = 'recommendations' %}
+{% set current_content = [] %}
+{% elif line.strip().startswith('**') and line.strip().endswith('**') and '**PROTEIN-RELATED RISK' in line %}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+{% set in_section = 'risk_highlights' %}
+{% set current_content = [] %}
+{% elif line.strip().startswith('**') and line.strip().endswith('**') and '**IMMEDIATE ACTION' in line %}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+{% set in_section = 'action_items' %}
+{% set current_content = [] %}
+{% elif line.strip().startswith('**') and line.strip().endswith('**') and '**EXECUTIVE SUMMARY' in line %}
+{% set in_section = 'summary' %}
+{% set current_content = [] %}
+{% else %}
+{% if in_section %}
+{% set _ = current_content.append(line) %}
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{# Save last section #}
+{% if in_section %}
+{% set _ = sections.update({in_section: current_content}) %}
+{% endif %}
+
+<div class="executive-summary-content">
+    {# Summary Statement #}
+    {% if sections.get('summary') %}
+    <div class="summary-highlight-box">
+        <h3 class="highlight-title"><i class="fas fa-info-circle"></i> Summary</h3>
+        {% for line in sections['summary'] %}
+        {% if line.strip() %}
+        <p>{{ line.strip() }}</p>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Key Protein Mutations Grid #}
+    {% if sections.get('key_mutations') %}
+    <div class="summary-section">
+        <h3 class="section-heading"><i class="fas fa-dna"></i> Key Protein Mutations</h3>
+        <div class="mutation-grid">
+            {% set mutation_count = 0 %}
+            {% for line in sections['key_mutations'] %}
+            {% if line.strip().startswith('•') %}
+            {% set mutation_count = mutation_count + 1 %}
+            <div class="mutation-summary-card">
+                <div class="card-num">Finding {{ mutation_count }}</div>
+                <div class="card-body">
+                    {{ line.strip()[1:].strip() | replace('**', '') }}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Risk Highlights #}
+    {% if sections.get('risk_highlights') %}
+    <div class="summary-section">
+        <h3 class="section-heading"><i class="fas fa-exclamation-triangle"></i> Protein-Related Risk highlights</h3>
+        <div class="risk-highlight-container">
+            {% for line in sections['risk_highlights'] %}
+            {% if line.strip() and line.strip().startswith('-') %}
+            <div class="risk-item">
+                <span class="risk-label">{{ line.strip()[1:].split(':')[0].strip() }}</span>
+                <span class="risk-value">{{ line.strip()[1:].split(':', 1)[1].strip() if ':' in line else '' }}</span>
+            </div>
+            {% elif line.strip() %}
+            <p>{{ line.strip() }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Recommendations & Actions Grid #}
+    <div class="action-recommendation-grid">
+        {# Primary Recommendations #}
+        {% if sections.get('recommendations') %}
+        <div class="summary-section">
+            <h3 class="section-heading"><i class="fas fa-clipboard-list"></i> Primary Recommendations</h3>
+            <div class="rec-list">
+                {% set rec_count = 0 %}
+                {% for line in sections['recommendations'] %}
+                {% if line.strip() and line.strip()[0].isdigit() %}
+                {% set rec_count = rec_count + 1 %}
+                <div class="rec-item">
+                    <div class="rec-header">
+                        <span class="rec-badge">Priority {{ rec_count }}</span>
+                    </div>
+                    <div class="rec-text">
+                        {{ line.strip()[2:].strip() if line.strip()[1] == '.' else line.strip() }}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Immediate Action Items #}
+        {% if sections.get('action_items') %}
+        <div class="summary-section">
+            <h3 class="section-heading"><i class="fas fa-tasks"></i> Immediate Action Items</h3>
+            <div class="action-list">
+                {% for line in sections['action_items'] %}
+                {% if line.strip().startswith('•') %}
+                <div class="action-pill">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ line.strip()[1:].strip() }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .executive-summary-content {
+        color: var(--text-main);
+    }
+
+    .summary-section {
+        margin-bottom: var(--space-xl);
+    }
+
+    .section-heading {
+        font-size: var(--text-lg);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-heading);
+        margin-bottom: var(--space-md);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-heading i {
+        color: var(--primary-blue);
+        opacity: 0.8;
+    }
+
+    /* Summary highlight box */
+    .summary-highlight-box {
+        background: var(--primary-blue-light);
+        border: 1px solid var(--accent-blue);
+        border-radius: var(--radius-lg);
+        padding: var(--padding-card);
+        margin-bottom: var(--space-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .highlight-title {
+        color: var(--primary-blue);
+        font-size: var(--text-xl);
+        font-weight: var(--font-weight-bold);
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .summary-highlight-box p {
+        margin: 0;
+        color: var(--primary-blue);
+        font-weight: 500;
+        line-height: var(--line-height-loose);
+    }
+
+    /* Mutation Grid */
+    .mutation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .mutation-summary-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-left: 4px solid var(--error-red);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        transition: var(--transition);
+        box-shadow: var(--card-shadow);
+    }
+
+    .mutation-summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-num {
+        font-size: var(--text-xs);
+        font-weight: var(--font-weight-bold);
+        text-transform: uppercase;
+        color: var(--error-red);
+        margin-bottom: 8px;
+    }
+
+    .mutation-summary-card .card-body {
+        color: var(--text-main);
+        font-weight: var(--font-weight-medium);
+        font-size: var(--text-base);
+    }
+
+    /* Risk highlights */
+    .risk-highlight-container {
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+    }
+
+    .risk-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .risk-label {
+        font-size: var(--text-xs);
+        font-weight: var(--font-weight-bold);
+        color: var(--warning-orange);
+        text-transform: uppercase;
+    }
+
+    .risk-value {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-heading);
+    }
+
+    /* Grid for Recs and Actions */
+    .action-recommendation-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+
+    .rec-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .rec-item {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        transition: var(--transition);
+    }
+
+    .rec-badge {
+        font-size: var(--text-xs);
+        font-weight: var(--font-weight-bold);
+        background: var(--success-green);
+        color: white;
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .rec-text {
+        color: var(--text-main);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .action-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .action-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 14px 20px;
+        color: var(--text-main);
+        font-weight: var(--font-weight-semibold);
+        transition: var(--transition);
+    }
+
+    .action-pill i {
+        color: var(--error-red);
+    }
+
+    .action-pill:hover {
+        border-color: var(--error-red);
+        background: #fef2f2;
+    }
+
+    @media (max-width: 768px) {
+        .action-recommendation-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% else %}
+<div class="alert alert-info" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    No executive summary content available.
+</div>
+{% endif %}

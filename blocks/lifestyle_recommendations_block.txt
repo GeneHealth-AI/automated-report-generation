@@ -1,0 +1,105 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate personalized lifestyle recommendations for a precision medicine report.
+
+**CRITICAL: ALL LIFESTYLE RECOMMENDATIONS MUST BE SPECIFICALLY TAILORED FOR**: <PROMPT>
+
+Focus recommendations on lifestyle modifications that are most relevant to: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Disease Genes/Predictions: <PROTEIN_DISEASES>
+Genetic Variants: <VARIANTS>
+Current Health Status: <HEALTHSTATUS>
+Family History: <FAMILY_HISTORY>
+Current Lifestyle: <CURRENTLIFESTYLE>
+Environmental Exposures: <ENVIRONMENTALEXPOSURES>
+rsIDs: <VARIANTS>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+If a field is blank ignore it.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create comprehensive lifestyle recommendations that include:
+
+1. A lifestyle summary that provides an overview of how genetic findings can be addressed through lifestyle modifications.
+
+2. Dietary recommendations based on genetic predispositions:
+   - Specific dietary changes or patterns
+   - Evidence level supporting each recommendation
+   - Rationale explaining the genetic basis
+
+3. Exercise recommendations tailored to genetic profile:
+   - Type of exercise (aerobic, resistance, flexibility, etc.)
+   - Frequency and duration
+   - Intensity level
+   - Specific benefits related to genetic risks
+
+4. Environmental factors to consider based on genetic sensitivities.
+
+5. Supplement considerations:
+   - Specific supplements that may be beneficial
+   - Recommended dosages
+   - Rationale based on genetic variants
+   - Precautions or interactions to consider
+
+Requirements:
+- Base recommendations on nutrigenomics and exercise genomics research
+- Include evidence levels for all recommendations
+- Consider gene-environment interactions
+- Provide practical, achievable suggestions
+- Account for contraindications based on health status
+- Focus on modifiable factors that can impact genetic risks
+- DO NOT HALLUCINATE - only include evidence-based recommendations
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "lifestyle_recommendations": {
+    "overview": "[Paragraph explaining the personalized lifestyle approach based on the patient's genetic profile]",
+    "dietary_recommendations": [
+      {
+        "recommendation": "[Specific dietary change or guideline]",
+        "evidence_level": "[Well-established/Moderate/Emerging/Limited]",
+        "rationale": "[How this addresses specific genetic predispositions]",
+        "genetic_basis": "[Specific genetic variants this addresses]"
+      }
+    ],
+    "exercise_recommendations": [
+      {
+        "type": "[Type of Exercise]",
+        "frequency": "[How often per week]",
+        "intensity": "[Low/Moderate/High]",
+        "duration": "[Recommended session length]",
+        "genetic_benefits": "[Specific benefits related to genetic profile]",
+        "rationale": "[Why this exercise type is recommended]"
+      }
+    ],
+    "environmental_considerations": [
+      {
+        "factor": "[Environmental factor]",
+        "recommendation": "[Specific recommendation]",
+        "genetic_rationale": "[Why this is important for the genetic profile]"
+      }
+    ],
+    "nutritional_supplements": [
+      {
+        "supplement": "[Supplement Name]",
+        "recommended_dosage": "[Amount and frequency]",
+        "genetic_rationale": "[Why this may help based on genetic variants]",
+        "precautions": "[Any warnings, interactions, or considerations]",
+        "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+      }
+    ],
+    "evidence_base": {
+      "scientific_studies": ["[Study 1]", "[Study 2]"],
+      "nutrigenomics_research": ["[Research 1]", "[Research 2]"],
+      "guidelines": ["[Guideline 1]", "[Guideline 2]"]
+    },
+  }
+}

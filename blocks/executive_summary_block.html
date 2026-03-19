@@ -1,0 +1,372 @@
+<div class="report-block executive-summary-block" data-block-type="executive_summary">
+    <div class="block-header">
+        <h2 style="color: var(--primary-blue);">{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if block.content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ block.content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if block.content.summary_statement %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-star" style="color: #f59e0b;"></i> Bottom Line</h3>
+            <div class="summary-statement-card">
+                <p>{{ block.content.summary_statement }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Your Risk vs. Average — Visual Comparison -->
+        {% if block.content.risk_snapshot %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-chart-bar" style="color: var(--primary-blue);"></i> Your Risk
+                vs. Average</h3>
+            <div class="risk-comparison-grid">
+                {% for item in block.content.risk_snapshot %}
+                <div class="risk-comparison-card">
+                    <div class="risk-comparison-label">{{ item.condition or item.disease }}</div>
+                    <div class="risk-bars">
+                        <div class="risk-bar-group">
+                            <div class="risk-bar-label">You</div>
+                            <div class="risk-bar-track">
+                                <div class="risk-bar-fill patient-risk"
+                                    style="width: {{ item.absolute_risk_pct | default(50) }}%;"></div>
+                            </div>
+                            <div class="risk-bar-value patient-value">{{ item.absolute_risk }}</div>
+                        </div>
+                        <div class="risk-bar-group">
+                            <div class="risk-bar-label">Average</div>
+                            <div class="risk-bar-track">
+                                <div class="risk-bar-fill population-risk"
+                                    style="width: {{ item.population_risk_pct | default(5) }}%;"></div>
+                            </div>
+                            <div class="risk-bar-value">{{ item.population_risk }}</div>
+                        </div>
+                    </div>
+                    <p class="risk-takeaway">{{ item.key_takeaway }}</p>
+                    {% if item.source %}
+                    <div class="risk-source">
+                        <i class="fas fa-book-open"></i> {{ item.source }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.summary_points %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-key" style="color: var(--accent-blue);"></i> Key Summary
+                Points</h3>
+            <div class="points-grid">
+                {% for point in block.content.summary_points %}
+                <div class="point-item">
+                    <i class="fas fa-check-circle" style="color: var(--success-green);"></i>
+                    <span>{{ point }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.key_protein_mutations %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-dna" style="color: #8b5cf6;"></i> Primary Genetic Risks</h3>
+            <div class="protein-highlights">
+                {% for item in block.content.key_protein_mutations %}
+                <div class="highlight-card">
+                    <div class="highlight-gene">{{ item.gene or item.protein }}</div>
+                    <div class="highlight-desc">{{ item.specific_mutation }}</div>
+                    {% if item.associated_diseases %}
+                    <div class="highlight-tags">
+                        {% for disease in item.associated_diseases %}
+                        <span class="highlight-tag">{{ disease }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if block.content.immediate_action_items %}
+        <div class="overview-section">
+            <h3 class="overview-heading"><i class="fas fa-bolt" style="color: var(--warning-orange);"></i> Important
+                Next Steps</h3>
+            <div class="actions-list">
+                {% for action in block.content.immediate_action_items %}
+                <div class="action-item">
+                    <span class="action-check"><i class="fas fa-arrow-right"></i></span>
+                    <div class="action-text">
+                        <strong>{{ action.action }}</strong>
+                        <p>{{ action.timeline }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="block-footer-note">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>A Note on Your Results:</strong> This summary provides the most critical takeaways from your
+                report. Detailed genetic analysis and clinical context can be found in the following sections.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .executive-summary-block .block-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+    }
+
+    .summary-statement-card {
+        background: var(--bg);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        border: 1px solid var(--border-light);
+        font-size: 1.15rem;
+        color: var(--text-heading);
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    /* Risk Comparison Visual */
+    .risk-comparison-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .risk-comparison-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .risk-comparison-label {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-heading);
+        margin-bottom: 1rem;
+    }
+
+    .risk-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .risk-bar-group {
+        display: grid;
+        grid-template-columns: 65px 1fr 100px;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .risk-bar-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    .risk-bar-track {
+        height: 14px;
+        background: var(--border-lighter, #edf2f7);
+        border-radius: 7px;
+        overflow: hidden;
+    }
+
+    .risk-bar-fill {
+        height: 100%;
+        border-radius: 7px;
+        transition: width 1s ease-out;
+        min-width: 4px;
+    }
+
+    .risk-bar-fill.patient-risk {
+        background: linear-gradient(90deg, var(--warning-orange), var(--error-red));
+    }
+
+    .risk-bar-fill.population-risk {
+        background: var(--success-green);
+    }
+
+    .risk-bar-value {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--text-heading);
+        text-align: right;
+    }
+
+    .risk-bar-value.patient-value {
+        color: var(--error-red);
+    }
+
+    .risk-takeaway {
+        margin: 1rem 0 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .risk-source {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Points Grid */
+    .points-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .point-item {
+        background: var(--card-bg);
+        border: 1px solid var(--border-lighter, #f1f5f9);
+        padding: 1.25rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .point-item span {
+        font-size: 1rem;
+        color: var(--secondary-text);
+    }
+
+    /* Protein Highlights */
+    .protein-highlights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .highlight-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s;
+    }
+
+    .highlight-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .highlight-gene {
+        font-weight: 800;
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.01em;
+    }
+
+    .highlight-desc {
+        font-size: 0.95rem;
+        color: var(--secondary-text);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        font-weight: 500;
+    }
+
+    .highlight-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .highlight-tag {
+        background: var(--primary-blue-light);
+        color: var(--info-blue);
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    /* Action Items */
+    .actions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-item {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .action-check {
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--warning-orange);
+        font-size: 1.25rem;
+        box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.1);
+        flex-shrink: 0;
+    }
+
+    .action-text strong {
+        display: block;
+        color: var(--text-heading);
+        font-size: 1.05rem;
+        margin-bottom: 0.25rem;
+        font-weight: 700;
+    }
+
+    .action-text p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    /* Section Heading */
+    .overview-heading {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-heading);
+        margin: 2.5rem 0 1.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+</style>

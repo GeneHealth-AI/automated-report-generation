@@ -1,0 +1,219 @@
+{# Default Block Display Template - Handles markdown-style text #}
+{% set content_text = block.content if block.content is string else block.content.get('text', '') %}
+
+{% if content_text %}
+<div class="block-formatted-content" data-block-type="default">
+    {% set lines = content_text.split('\n') %}
+    {% set in_list = false %}
+
+    {% for line in lines %}
+    {% set stripped_line = line.strip() %}
+
+    {# Handle main headers **HEADER** #}
+    {% if stripped_line.startswith('**') and stripped_line.endswith('**') and stripped_line.count('**') == 2 %}
+    {% if in_list %}
+    </ul>
+    {% set in_list = false %}
+    {% endif %}
+    <h3 class="formatted-h3">
+        {{ stripped_line[2:-2] }}
+    </h3>
+
+    {# Handle sub-headers with format **Header**: content #}
+    {% elif '**' in stripped_line and ':' in stripped_line %}
+    {% if in_list %}
+    </ul>
+    {% set in_list = false %}
+    {% endif %}
+    {% set parts = stripped_line.split(':', 1) %}
+    {% if parts[0].strip().startswith('**') and parts[0].strip().endswith('**') %}
+    <h5 class="formatted-h5">
+        {{ parts[0].strip()[2:-2] }}:
+    </h5>
+    {% if parts[1].strip() %}
+    <p class="formatted-p">{{ parts[1].strip() | safe }}</p>
+    {% endif %}
+    {% else %}
+    <p class="formatted-p">{{ stripped_line | safe }}</p>
+    {% endif %}
+
+    {# Handle bullet points #}
+    {% elif stripped_line.startswith('•') or stripped_line.startswith('-') %}
+    {% if not in_list %}
+    <ul class="formatted-list-v2">
+        {% set in_list = true %}
+        {% endif %}
+        <li>
+            {% set item_text = stripped_line[1:].strip() if stripped_line[0] == '•' else stripped_line[1:].strip() %}
+            {# Process bold text within list items #}
+            {% set item_text = item_text | replace('**', '<strong>', 1) | replace('**', '</strong>', 1) %}
+            {{ item_text | safe }}
+        </li>
+
+        {# Handle numbered lists #}
+        {% elif stripped_line and stripped_line[0].isdigit() and '. ' in stripped_line[:3] %}
+        {% if in_list %}
+    </ul>
+    {% set in_list = false %}
+    {% endif %}
+    <div class="formatted-numbered-item">
+        <span class="number-tag">{{ stripped_line.split('.', 1)[0] }}</span>
+        <div class="number-content">
+            {% set item_content = stripped_line.split('.', 1)[1].strip() %}
+            {% set item_content = item_content | replace('**', '<strong>', 1) | replace('**', '</strong>', 1) %}
+            {{ item_content | safe }}
+        </div>
+    </div>
+
+    {# Handle empty lines #}
+    {% elif not stripped_line %}
+    {% if in_list %}
+    </ul>
+    {% set in_list = false %}
+    {% endif %}
+
+    {# Handle regular paragraphs #}
+    {% else %}
+    {% if in_list %}
+    </ul>
+    {% set in_list = false %}
+    {% endif %}
+    {% if stripped_line %}
+    <p class="formatted-p">
+        {# Process bold text #}
+        {% set processed_line = stripped_line %}
+        {% if '**' in processed_line %}
+        {% set parts = processed_line.split('**') %}
+        {% for i in range(parts|length) %}
+        {% if i % 2 == 1 %}
+        <strong>{{ parts[i] }}</strong>
+        {% else %}
+        {{ parts[i] }}
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        {{ processed_line }}
+        {% endif %}
+    </p>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    {# Close any open list #}
+    {% if in_list %}
+    </ul>
+    {% endif %}
+</div>
+
+<style>
+    .block-formatted-content {
+        font-family: 'Outfit', sans-serif;
+        color: var(--text-main);
+        line-height: 1.8;
+    }
+
+    .formatted-h3 {
+        font-size: var(--text-xl);
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin: 40px 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .formatted-h5 {
+        font-size: var(--text-md);
+        font-weight: 800;
+        color: var(--text-heading);
+        margin: 24px 0 12px 0;
+    }
+
+    .formatted-p {
+        margin-bottom: 16px;
+        color: var(--text-muted);
+        font-size: var(--text-md);
+    }
+
+    .formatted-list-v2 {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 32px;
+    }
+
+    .formatted-list-v2 li {
+        position: relative;
+        padding-left: 28px;
+        margin-bottom: 12px;
+        color: var(--text-muted);
+        font-size: var(--text-md);
+    }
+
+    .formatted-list-v2 li::before {
+        content: "\f058";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: var(--success-green);
+        font-size: 16px;
+    }
+
+    .formatted-numbered-item {
+        display: flex;
+        gap: 16px;
+        background: #f8fafc;
+        border: 1px solid var(--border-light);
+        padding: 20px 24px;
+        border-radius: var(--radius-xl);
+        margin-bottom: 16px;
+    }
+
+    .number-tag {
+        background: var(--primary-blue);
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .number-content {
+        font-size: var(--text-md);
+        color: var(--text-main);
+    }
+
+    .block-formatted-content strong {
+        color: var(--text-heading);
+        font-weight: 700;
+    }
+</style>
+{% else %}
+<div class="no-content-alert">
+    <i class="fas fa-info-circle"></i>
+    <span>Information not available for this analysis section.</span>
+</div>
+
+<style>
+    .no-content-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        padding: 16px 24px;
+        border-radius: var(--radius-lg);
+        color: #64748b;
+        font-size: var(--text-sm);
+        margin: 20px 0;
+    }
+
+    .no-content-alert i {
+        color: #94a3b8;
+    }
+</style>
+{% endif %}

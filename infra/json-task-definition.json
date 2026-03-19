@@ -1,0 +1,46 @@
+{
+  "family": "report-generator-json",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::339712911975:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::339712911975:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "report-generator-json",
+      "image": "339712911975.dkr.ecr.us-east-1.amazonaws.com/report-generator-json:latest",
+      "essential": true,
+      "environment": [
+        {
+          "name": "PYTHONUNBUFFERED",
+          "value": "1"
+        },
+        {
+          "name": "BLOCKS_PATH",
+          "value": "./blocks"
+        },
+        {
+          "name": "KNOWGENE_PATH",
+          "value": "./allproteins2knowgene"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/report-generator-json",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "python -c 'import sys; sys.exit(0)'"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

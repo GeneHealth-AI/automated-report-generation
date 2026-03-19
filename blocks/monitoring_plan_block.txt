@@ -1,0 +1,127 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive monitoring plan for a precision medicine report.
+
+**THIS MONITORING PLAN MUST BE SPECIFICALLY DESIGNED FOR**: <PROMPT>
+
+Focus the monitoring strategy on early detection and management of conditions related to: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Genetic Variants: <VARIANTS>
+Risk Level: <RISKLEVEL>
+Current Health Status: <HEALTHSTATUS>
+Family History: <FAMILY_HISTORY>
+Age: <AGE>
+Clinical History: <CLINICALHISTORY>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+
+CRITICAL FOCUS: Design the monitoring plan specifically around the diseases associated with the mutated proteins identified. Each monitoring recommendation should directly relate to early detection and management of protein-associated conditions.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a detailed monitoring plan that includes:
+
+1. Protein-specific biomarker monitoring:
+   - Markers for diseases associated with each mutated protein
+   - Protein function tests where available
+   - Disease-specific biomarkers linked to protein mutations
+   - Monitoring frequency based on protein-disease risk
+
+2. Disease surveillance for protein-associated conditions:
+   - Screening for each disease linked to mutated proteins
+   - Imaging studies for protein-related pathology
+   - Functional assessments of affected organ systems
+
+3. Protein dysfunction warning signs:
+   - Symptoms indicating protein-related disease onset
+   - Early manifestations of protein dysfunction
+   - Progressive signs of protein-associated conditions
+
+4. Emergency indicators for protein-related crises
+
+5. Progress metrics specific to protein function and disease prevention
+
+TONE REQUIREMENTS:
+- Use reassuring, practical language throughout
+- Frame warning signs as "things to be aware of" rather than alarm signals
+- Use "contact your healthcare provider" rather than "seek immediate medical attention" except for genuine emergencies
+- Avoid phrases like "vigilance", "strategic proactivity", "surveillance protocol"
+- Use simpler alternatives: "check-ups", "monitoring schedule", "things to watch for"
+- Write for a patient audience: 8th grade reading level, short sentences, common words
+
+Requirements:
+- PRIORITIZE monitoring for diseases directly linked to the mutated proteins
+- Base surveillance on the specific diseases associated with each protein
+- Include protein function assessments where clinically available
+- Focus on early detection of protein-related pathology
+- Timeline based on natural history of protein-associated diseases
+- DEDUPLICATION & CONSOLIDATION: Ensure each condition (e.g., "Pancreatic Cancer") has ONLY ONE entry in the surveillance schedule. Combine all relevant tests (MRI, blood work, etc.) into a single recommendation for that condition along with a unified frequency (e.g., "Every 6 months"). Do not repeat condition names across different timeframes.
+- CAUTION: Be conservative and cautious in all clinical recommendations. Use appropriate qualifying language (e.g., "may be considered," "if clinically indicated").
+- DO NOT HALLUCINATE - use established protocols for monitoring protein-related diseases
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "monitoring_plan": {
+    "protein_specific_monitoring": [
+      {
+        "protein": "[PROTEIN NAME]",
+        "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+        "biomarkers": [
+          {
+            "biomarker": "[Biomarker name]",
+            "frequency": "[Monitoring frequency]",
+            "normal_range": "[Normal range]",
+            "monitors": "[What aspect of protein-related disease]"
+          }
+        ],
+        "protein_function_tests": "[If available for this protein]",
+        "imaging_surveillance": "[For organs affected by this protein's associated diseases]"
+      }
+    ],
+    "disease_surveillance_schedule": [
+      {
+        "disease": "[Disease Name]",
+        "associated_protein": "[Protein name]",
+        "timepoint": "[Consolidated timing, e.g., Every 6 months or Annually]",
+        "recommendations": ["[Consolidated recommendation 1]", "[Consolidated recommendation 2]"]
+      }
+    ],
+    "warning_signs": [
+      {
+        "disease": "[Disease name]",
+        "associated_protein": "[Protein name]",
+        "symptoms": ["[Symptom 1]", "[Symptom 2]"],
+        "action": "Contact your healthcare provider"
+      }
+    ],
+    "emergency_indicators": [
+      {
+        "condition": "[Acute condition name]",
+        "associated_protein": "[Protein name]",
+        "emergency_symptoms": ["[Emergency symptom 1]", "[Emergency symptom 2]"],
+        "action": "Seek immediate care"
+      }
+    ],
+    "prevention_metrics": [
+      {
+        "protein": "[Protein name]",
+        "function_assessment": "[How to assess - clinical or laboratory markers]",
+        "disease_prevention_metrics": "[Metrics showing risk reduction]",
+        "treatment_response_indicators": "[For protein-targeted interventions]"
+      }
+    ],
+    "monitoring_protocols": {
+      "clinical_guidelines": ["[Guideline 1]", "[Guideline 2]"],
+      "protocol_sources": ["[Source 1]", "[Source 2]"],
+      "evidence_base": "[Evidence supporting monitoring recommendations]"
+    },
+  }
+}

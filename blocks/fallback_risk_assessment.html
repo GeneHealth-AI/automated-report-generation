@@ -1,0 +1,238 @@
+<!-- Fallback Risk Assessment Template for Edge Cases -->
+<div class="report-block fallback-risk-assessment" data-block-type="risk_assessment">
+    <div class="block-header">
+        <h2>Risk Assessment for {{ context.condition }}</h2>
+        <div class="fallback-indicator">
+            <i class="fas fa-info-circle"></i>
+            <span>Simplified View</span>
+        </div>
+    </div>
+    
+    <div class="block-content">
+        <div class="fallback-content">
+            <!-- Basic Risk Information -->
+            <div class="basic-risk-info">
+                <h3>Genetic Risk Analysis</h3>
+                
+                {% if context.risk_variant_count > 0 %}
+                <div class="risk-summary">
+                    <div class="risk-indicator moderate">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>{{ context.risk_variant_count }} genetic variant{{ 's' if context.risk_variant_count != 1 else '' }} associated with increased risk identified</span>
+                    </div>
+                    
+                    <div class="variant-list">
+                        <h4>Risk-Associated Variants:</h4>
+                        <ul>
+                            {% for variant in context.risk_variants %}
+                            <li>
+                                <strong>{{ variant.gene }}</strong> ({{ variant.rsid }}) - 
+                                {{ variant.confidence_level.value }} confidence
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-risk-variants">
+                    <div class="neutral-indicator">
+                        <i class="fas fa-check-circle"></i>
+                        <span>No significant genetic variants associated with increased risk for {{ context.condition }} were identified</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Basic Recommendations -->
+            <div class="basic-recommendations">
+                <h3>General Recommendations</h3>
+                <div class="recommendation-box">
+                    {% if context.risk_variant_count > 0 %}
+                    <p>Based on your genetic profile, consider:</p>
+                    <ul>
+                        <li>Discussing these findings with your healthcare provider</li>
+                        <li>Following standard screening guidelines for {{ context.condition }}</li>
+                        <li>Maintaining healthy lifestyle practices</li>
+                        <li>Staying informed about new research developments</li>
+                    </ul>
+                    {% else %}
+                    <p>While no high-risk genetic variants were identified:</p>
+                    <ul>
+                        <li>Continue following standard health guidelines</li>
+                        <li>Maintain regular check-ups with your healthcare provider</li>
+                        <li>Remember that genetics is only one factor in health outcomes</li>
+                        <li>Environmental and lifestyle factors remain important</li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Limitations Notice -->
+            <div class="limitations-notice">
+                <h4><i class="fas fa-exclamation-triangle"></i> Important Limitations</h4>
+                <div class="notice-content">
+                    <p>This simplified analysis has limitations:</p>
+                    <ul>
+                        <li>Based on currently available genetic knowledge</li>
+                        <li>Does not include all possible genetic factors</li>
+                        <li>Cannot predict individual health outcomes with certainty</li>
+                        <li>Should not replace professional medical advice</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Upgrade Notice -->
+            <div class="upgrade-notice">
+                <div class="upgrade-content">
+                    <i class="fas fa-arrow-up"></i>
+                    <div class="upgrade-text">
+                        <h4>Enhanced Analysis Available</h4>
+                        <p>A more detailed risk assessment with advanced features may be available. Contact support for more information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.fallback-risk-assessment {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f7fafc;
+    margin: 1rem 0;
+}
+
+.fallback-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #edf2f7;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.fallback-content {
+    padding: 1.5rem;
+}
+
+.basic-risk-info {
+    margin-bottom: 2rem;
+}
+
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.risk-indicator.moderate {
+    background: #fef5e7;
+    border: 1px solid #fbd38d;
+    color: #c05621;
+}
+
+.neutral-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    color: #2f855a;
+}
+
+.variant-list {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.variant-list h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+}
+
+.variant-list ul {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.variant-list li {
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+}
+
+.basic-recommendations {
+    margin-bottom: 2rem;
+}
+
+.recommendation-box {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.recommendation-box ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #4a5568;
+}
+
+.limitations-notice {
+    background: #fffaf0;
+    border: 1px solid #fbd38d;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.limitations-notice h4 {
+    margin: 0 0 0.5rem 0;
+    color: #c05621;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notice-content ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #744210;
+}
+
+.upgrade-notice {
+    background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+    border: 1px solid #81e6d9;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.upgrade-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.upgrade-content i {
+    color: #319795;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+}
+
+.upgrade-text h4 {
+    margin: 0 0 0.5rem 0;
+    color: #234e52;
+}
+
+.upgrade-text p {
+    margin: 0;
+    color: #285e61;
+}
+</style>

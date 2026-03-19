@@ -1,0 +1,323 @@
+<div class="neutral-variants-section" data-block-type="neutral_variants">
+    <div class="block-header">
+        <h2 class="neutral-variants-title">{{ neutral_variants.section_title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% if neutral_variants.educational_content %}
+        <div class="edu-card">
+            <div class="edu-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>{{ neutral_variants.educational_content.title }}</h3>
+            </div>
+            <div class="edu-body">
+                <p>{{ neutral_variants.educational_content.overview }}</p>
+                <div class="key-points-grid">
+                    {% for point in neutral_variants.educational_content.key_points %}
+                    <div class="point-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>{{ point }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="clinical-importance-box">
+                    <strong>Clinical Context:</strong> {{ neutral_variants.educational_content.clinical_importance }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="neutral-stats-banner">
+            <div class="stat-item">
+                <span class="stat-value">{{ neutral_variants.variant_summary.neutral_count }}</span>
+                <span class="stat-label">Neutral Variants</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value">{{ neutral_variants.variant_summary.unknown_count }}</span>
+                <span class="stat-label">Unknown Significance</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value">{{ neutral_variants.variant_summary.genes_affected }}</span>
+                <span class="stat-label">Genes Affected</span>
+            </div>
+        </div>
+
+        {% if neutral_variants.variant_details %}
+        <div class="variant-table-container">
+            <h3>Detailed Variant Inventory</h3>
+            <div class="table-wrapper">
+                <table class="neutral-variants-table">
+                    <thead>
+                        <tr>
+                            <th>Variant ID</th>
+                            <th>Gene</th>
+                            <th>Locus</th>
+                            <th>Clinical Significance</th>
+                            <th>Pop. Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variant in neutral_variants.variant_details %}
+                        <tr>
+                            <td class="rsid-col">{{ variant.rsid }}</td>
+                            <td class="gene-col"><strong>{{ variant.gene }}</strong></td>
+                            <td>{{ variant.chromosome }}</td>
+                            <td><span class="sig-badge">{{ variant.clinical_significance }}</span></td>
+                            <td class="freq-col">{{ variant.frequency_description }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if neutral_variants.truncation_note %}
+        <div class="truncation-alert">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ neutral_variants.truncation_note }}</span>
+        </div>
+        {% endif %}
+
+        {% if neutral_variants.future_relevance %}
+        <div class="future-relevance-card">
+            <div class="future-header">
+                <i class="fas fa-forward-step"></i>
+                <h4>Future Clinical Trajectory</h4>
+            </div>
+            <p>{{ neutral_variants.future_relevance }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .neutral-variants-section {
+        color: var(--text-main);
+    }
+
+    .neutral-variants-title {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-lg);
+    }
+
+    /* Educational Card */
+    .edu-card {
+        background: #f8fafc;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+
+    .edu-header {
+        background: #f1f5f9;
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .edu-header i {
+        color: var(--primary-blue);
+        font-size: 20px;
+    }
+
+    .edu-header h3 {
+        margin: 0;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--text-heading);
+    }
+
+    .edu-body {
+        padding: 32px;
+    }
+
+    .edu-body p {
+        margin-bottom: 24px;
+        line-height: 1.7;
+        color: var(--text-muted);
+    }
+
+    .key-points-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .point-item {
+        display: flex;
+        gap: 12px;
+        font-size: var(--text-sm);
+        color: var(--text-main);
+        background: white;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-light);
+    }
+
+    .point-item i {
+        color: var(--success-green);
+        margin-top: 2px;
+    }
+
+    .clinical-importance-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 16px 24px;
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        color: #1e40af;
+    }
+
+    /* Stats Banner */
+    .neutral-stats-banner {
+        display: flex;
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        margin-bottom: 40px;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--primary-blue);
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: var(--text-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.1em;
+    }
+
+    .stat-divider {
+        width: 1px;
+        height: 40px;
+        background: #e2e8f0;
+    }
+
+    /* Table Styling */
+    .variant-table-container h3 {
+        font-size: var(--text-lg);
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--text-heading);
+    }
+
+    .table-wrapper {
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        background: white;
+        box-shadow: var(--card-shadow);
+    }
+
+    .neutral-variants-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--text-sm);
+    }
+
+    .neutral-variants-table th {
+        background: #f8fafc;
+        padding: 16px 24px;
+        text-align: left;
+        font-weight: 700;
+        color: #475569;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .neutral-variants-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid #f1f5f9;
+        color: var(--text-muted);
+    }
+
+    .neutral-variants-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .rsid-col {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+
+    .gene-col {
+        color: var(--text-heading);
+    }
+
+    .sig-badge {
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    /* Trajectory Card */
+    .future-relevance-card {
+        margin-top: 40px;
+        background: #f0f9ff;
+        border: 1px solid #e0f2fe;
+        border-radius: var(--radius-xl);
+        padding: 32px;
+    }
+
+    .future-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        color: #0369a1;
+    }
+
+    .future-header i {
+        font-size: 18px;
+    }
+
+    .future-header h4 {
+        margin: 0;
+        font-size: var(--text-md);
+        font-weight: 700;
+    }
+
+    .future-relevance-card p {
+        margin: 0;
+        font-size: var(--text-sm);
+        line-height: 1.6;
+        color: #0c4a6e;
+    }
+
+    .truncation-alert {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--text-xs);
+        color: #94a3b8;
+        font-style: italic;
+    }
+</style>

@@ -1,0 +1,214 @@
+<div class="report-block introduction-block" data-block-type="introduction">
+    <div class="block-header">
+        <h2>{{ block.title }}</h2>
+    </div>
+
+    <div class="block-content">
+        {% set content = block.content.introduction if block.content.introduction else block.content %}
+
+        {% if content.error %}
+        <div class="error-message">
+            <p><strong>Error:</strong> {{ content.message }}</p>
+        </div>
+        {% else %}
+
+        {% if content.overview %}
+        <div class="info-section">
+            <h3 class="section-heading"><i class="fas fa-eye"></i> Overview</h3>
+            <p>{{ content.overview }}</p>
+        </div>
+        {% endif %}
+
+        {% set approach_raw = content.approach or content.analytical_approach %}
+        {% if approach_raw %}
+        <div class="info-section">
+            <h3 class="section-heading"><i class="fas fa-microscope"></i> Our Approach</h3>
+            {% if approach_raw is mapping %}
+            <p>{{ approach_raw.methodology or approach_raw.description or approach_raw.summary or approach_raw }}</p>
+            {% else %}
+            <p>{{ approach_raw }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% set scope_raw = content.scope or content.scope_of_analysis %}
+        {% if scope_raw %}
+        <div class="info-section">
+            <h3 class="section-heading"><i class="fas fa-bullseye"></i> Report Scope</h3>
+            {% if scope_raw is mapping %}
+            <p>{{ scope_raw.coverage or scope_raw.description or scope_raw.summary or scope_raw }}</p>
+            {% else %}
+            <p>{{ scope_raw }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% set things_to_know = content.important_things_to_know or content.disclaimers or content.important_disclaimers
+        %}
+        {% if things_to_know %}
+        <div class="disclaimers-section">
+            <h3 class="section-heading"><i class="fas fa-exclamation-circle"></i> Important Considerations</h3>
+            <div class="disclaimer-list">
+                {% for item in things_to_know %}
+                <div class="disclaimer-item expanded">
+                    {% if item is mapping %}
+                    <div class="disclaimer-header" onclick="toggleIntroAccordion(this)" aria-expanded="true">
+                        <span class="disclaimer-title">{{ item.title or item.category or 'General Note' }}</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="disclaimer-content">
+                        <div class="disclaimer-inner">
+                            {{ item.content or item.description or item }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="disclaimer-header" onclick="toggleIntroAccordion(this)" aria-expanded="true">
+                        <span class="disclaimer-title">Patient Notice</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="disclaimer-content">
+                        <div class="disclaimer-inner">
+                            {{ item }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    if (typeof toggleIntroAccordion !== 'function') {
+        window.toggleIntroAccordion = function (header) {
+            const item = header.parentElement;
+            const isExpanded = item.classList.contains('expanded');
+
+
+
+            item.classList.toggle('expanded');
+            header.setAttribute('aria-expanded', !isExpanded);
+        };
+    }
+</script>
+
+<style>
+    .introduction-block {
+        color: var(--text-main);
+    }
+
+    .introduction-block h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary-blue);
+        margin-bottom: var(--space-md);
+        letter-spacing: -0.02em;
+    }
+
+    .section-heading {
+        font-size: var(--text-lg);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-heading);
+        margin: var(--space-md) 0 var(--space-sm);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-heading i {
+        color: var(--primary-blue);
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+
+    .introduction-block p {
+        margin-bottom: var(--space-sm);
+        color: var(--text-muted);
+    }
+
+    .info-section {
+        margin-bottom: var(--space-lg);
+    }
+
+    /* Accordion Styles */
+    .disclaimer-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .disclaimer-item {
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .disclaimer-item.expanded {
+        border-color: var(--primary-blue-light);
+        background: white;
+        box-shadow: var(--card-shadow);
+    }
+
+    .disclaimer-header {
+        padding: 16px 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+        transition: background 0.2s;
+    }
+
+    .disclaimer-header:hover {
+        background: rgba(30, 64, 175, 0.03);
+    }
+
+    .disclaimer-title {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-heading);
+        font-size: var(--text-base);
+    }
+
+    .accordion-icon {
+        color: var(--text-light);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+    }
+
+    .disclaimer-item.expanded .accordion-icon {
+        transform: rotate(180deg);
+        color: var(--primary-blue);
+    }
+
+    .disclaimer-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: var(--accordion-transition);
+        opacity: 0;
+    }
+
+    .disclaimer-item.expanded .disclaimer-content {
+        max-height: 1000px;
+        opacity: 1;
+    }
+
+    .disclaimer-inner {
+        padding: 0 20px 20px;
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        line-height: var(--line-height-normal);
+    }
+
+    .error-message {
+        padding: 16px;
+        background: #fef2f2;
+        border-left: 4px solid var(--error-red);
+        border-radius: 8px;
+        color: #991b1b;
+    }
+</style>

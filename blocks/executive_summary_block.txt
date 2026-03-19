@@ -1,0 +1,148 @@
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a comprehensive executive summary for a precision medicine report.
+
+**CRITICAL FOCUS FOR THIS REPORT**: <PROMPT>
+
+Analyze the following patient data with specific attention to how it relates to: <PROMPT>
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Genetic Variants: <VARIANTS>
+Family History: <FAMILY_HISTORY>
+Patient Demographics: <DEMOGRAPHICS>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+Known Risk Data: <RISK_DATA>
+
+CRITICAL FOCUS: This report should emphasize the specific proteins that are mutated and their known disease associations. The protein mutations and their clinical implications should be the primary focus of your analysis.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create an executive summary that includes:
+
+1. A summary statement that highlights the PROTEIN MUTATIONS identified and their potential disease implications.
+
+2. Key protein findings that detail:
+   - Which specific proteins are mutated
+   - The known disease associations for each mutated protein
+   - The clinical significance of these protein alterations
+   - How these protein mutations relate to the patient's presentation
+
+3. Primary recommendations based on the identified protein mutations, including:
+   - Targeted screening for diseases associated with the mutated proteins
+   - Protein-specific therapeutic considerations
+   - Monitoring protocols for protein dysfunction
+
+4. Risk highlights focusing on:
+   - Diseases that may be associated with the identified mutated proteins
+   - Protein pathways that could potentially be disrupted
+   - Possible effects of the protein mutations
+
+5. Action items specifically addressing the protein mutations and their management.
+
+6. RISK SNAPSHOT comparing patient risk to population average:
+   - For each significant condition, provide the patient's estimated absolute risk and the general population baseline
+   - Use data from the Known Risk Data provided above when available for the specific genes
+   - If no specific risk data is available, use well-established published literature to estimate risk levels (e.g., "higher than average" or "moderately elevated")
+   - Include the source of the risk estimate (e.g., "Based on LIFETIME_RISK_MAPPING" or "Published literature estimates")
+   - Write the key_takeaway in plain language that a non-medical person can understand
+   - Include absolute_risk_pct (a numeric 0-100 integer for visual bar width) and population_risk_pct (numeric 0-100)
+
+CRITICAL LANGUAGE REQUIREMENTS:
+- Write at an 8TH GRADE READING LEVEL. Use short sentences. Use common words.
+- The summary_statement must be NO MORE THAN 2 SENTENCES. State the bottom line clearly and directly.
+- Replace medical jargon with plain English:
+  * "pathogenic variant" -> "gene change that may increase risk"
+  * "penetrance" -> "likelihood"
+  * "heterozygous" -> "one copy of the gene change"
+  * "autosomal dominant" -> "inherited from one parent"
+  * "VUS" -> "gene change of uncertain meaning"
+- Tone: Factual but empowering. NOT fear-inducing.
+- Use "may increase" rather than "increases". Use "your results suggest" rather than "you have".
+- Frame risks with context: Include perspective like "many people with these findings live healthy lives with proper monitoring."
+- DO NOT use the word "Urgent". Use "Critical", "Highly Recommended", or "Important Next Steps" instead.
+
+Requirements:
+- PRIORITIZE protein mutations and their disease associations above generic genetic information
+- Focus on established protein-disease relationships from clinical databases
+- Emphasize the functional impact of protein mutations while acknowledging uncertainty where it exists
+- Use clear language explaining how protein changes may lead to disease risk
+- Base all protein-disease associations on validated scientific evidence
+- Include appropriate caveats about the strength and limitations of evidence
+- Avoid overstating certainty - use qualifying language like "may be associated with", "could potentially", "evidence suggests"
+- DO NOT HALLUCINATE - only include protein-disease relationships supported by databases like KnowGene, ClinVar, etc.
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following structure:
+
+{
+  "executive_summary": {
+    "summary_statement": "[1-2 sentences MAX. Clear bottom line in plain language about what the genetic findings mean.]",
+    "risk_snapshot": [
+      {
+        "condition": "[Primary condition from report focus]",
+        "absolute_risk": "[Patient's estimated lifetime risk, e.g., '40-50% by age 70']",
+        "population_risk": "[General population risk, e.g., '1-2%']",
+        "absolute_risk_pct": 45,
+        "population_risk_pct": 2,
+        "key_takeaway": "[One plain-language sentence explaining what this means]",
+        "source": "[Source: e.g., 'Published clinical literature' or 'Gene-specific risk mapping']"
+      }
+    ],
+    "summary_points": [
+      "[Key finding in plain English]",
+      "[Another key finding in plain English]"
+    ],
+    "key_protein_mutations": [
+      {
+        "protein": "[Protein name]",
+        "gene": "[Gene name]",
+        "specific_mutation": "[e.g., Position 42 Alanine to Serine]",
+        "associated_diseases": ["[Disease 1]", "[Disease 2]"],
+        "clinical_significance": "[Brief clinical significance]",
+        "overall_affect": "[Neutral, Protective, or Risk-Increasing]"
+      }
+    ],
+    "immediate_action_items": [
+      {
+        "action": "[Clear action in plain language]",
+        "timeline": "[When to do it, e.g., 'Within 1 month']"
+      }
+    ],
+    "primary_recommendations": [
+      {
+        "recommendation": "[Recommendation text]",
+        "type": "[screening/intervention/monitoring]",
+        "protein_basis": "[Which protein mutation this addresses]",
+        "priority": "[high/medium/low]"
+      }
+    ],
+    "risk_highlights": {
+      "summary": "[Plain-language summary of disease risks based on the specific proteins mutated]",
+      "high_risk_diseases": [
+        {
+          "disease": "[Disease name]",
+          "associated_proteins": ["[Protein 1]", "[Protein 2]"],
+          "risk_level": "[Risk level]",
+          "pathway_effects": "[How this may affect health]"
+        }
+      ]
+    },
+    "evidence_sources": {
+      "databases": ["[Database 1]", "[Database 2]"],
+      "protein_disease_associations": [
+        {
+          "protein": "[Protein name]",
+          "disease": "[Disease name]",
+          "source": "[Source database/study]",
+          "evidence_level": "[well-established/moderate/emerging/limited]"
+        }
+      ]
+    }
+  }
+}

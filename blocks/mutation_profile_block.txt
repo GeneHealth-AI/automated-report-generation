@@ -1,0 +1,170 @@
+Prompt: <PROMPT>
+
+Previous Version: <PREVIOUS_TEXT>
+Feedback: <FEEDBACK>
+Previous Block Summaries: <PREVIOUS_BLOCK_SUMMARIES>
+
+Generate a detailed mutation profile section for a precision medicine report with VARIANT TYPE SEPARATION for risk-increasing and protective variants:
+
+Please focus on the following genes if this list is not blank: <GENESOFINTEREST>
+
+Mutated Proteins List: <MUTATED_PROTEINS>
+Protein-Disease Associations: <PROTEIN_DISEASES>
+Detailed Protein Mutations: <PROTEIN_MUTATIONS>
+Combined Protein-Disease-Mutations Analysis: <PROTEIN_DISEASE_MUTATIONS>
+Genetic Variants: <VARIANTS>
+
+IMPORTANT - VERIFIED VARIANT DATA: The Genetic Variants field above contains VERIFIED variant data from the actual input analysis. Each variant entry includes Gene, Protein ID (NP accession), HGVS notation, amino acid change, pathogenicity score, and effect direction. You MUST use ONLY this verified data when describing variants. Do NOT fabricate, invent, or look up rsIDs (rs numbers), ClinVar accessions, or dbSNP identifiers. If no rsID is provided, use the HGVS notation (e.g., NP_002760.1:p.Gly62Ala) as the variant identifier.
+Family History: <FAMILY_HISTORY>
+GWAS Associationed Mutations: <GWAS_ASSOCIATIONS>
+PubMed Research Evidence (High-Scoring Genes): <PUBMED_EVIDENCE>
+
+ENHANCED VARIANT TYPE SEPARATION:
+Risk-Increasing Variants: <RISK_VARIANTS>
+Protective Variants: <PROTECTIVE_VARIANTS>
+Show Risk Section: <SHOW_RISK_SECTION>
+Show Protective Section: <SHOW_PROTECTIVE_SECTION>
+Section Configuration: <SECTION_CONFIG>
+
+CRITICAL INSTRUCTIONS: Focus primarily on the PROTEIN MUTATIONS and their known disease associations. SEPARATE VARIANT TYPES - organize risk-increasing and protective variants into distinct categories with appropriate descriptions.
+
+VARIANT TYPE SEPARATION LOGIC:
+- If SHOW_RISK_SECTION is true, include risk-increasing variant analysis
+- If SHOW_PROTECTIVE_SECTION is true, include protective variant analysis
+- Use distinct language and emphasis for each variant type
+- Clearly differentiate between risk-increasing and protective protein effects
+
+REDUNDANCY PREVENTION: This is the foundational genetic analysis section. Provide comprehensive mutation details here that other sections will reference and build upon. Do NOT repeat basic mutation information in later sections.
+
+If feedback is provided, incorporate it to improve the previous version. If previous block summaries are provided, use them to ensure consistency and build upon the information already presented.
+
+Create a comprehensive mutation profile with VARIANT TYPE SEPARATION that includes:
+
+1. RISK-INCREASING VARIANT PROFILE (if SHOW_RISK_SECTION is true):
+   - Risk-increasing proteins and their disease associations
+   - Functional domains affected that increase disease risk
+   - Biological pathways disrupted leading to increased risk
+   - Clinical significance of risk-increasing protein alterations
+
+2. PROTECTIVE VARIANT PROFILE (if SHOW_PROTECTIVE_SECTION is true):
+   - Protective proteins and their disease-protective associations
+   - Functional domains that provide disease protection
+   - Biological pathways enhanced for disease protection
+   - Clinical significance of protective protein variants
+
+3. DETAILED VARIANT ANALYSIS BY TYPE:
+   - Risk-increasing variants: protein dysfunction and disease mechanisms
+   - Protective variants: enhanced protein function and protective mechanisms
+   - Variant-to-protein mapping separated by effect direction
+   - Functional consequences categorized by risk vs protective effects
+
+4. INTEGRATED GENETIC PROFILE:
+   - Cumulative effect considering both risk-increasing and protective variants
+   - Pathway-level analysis of competing effects
+   - Net genetic risk/protection assessment
+   - Complex interactions between variant types
+
+Requirements:
+- PRIORITIZE protein-level changes and their disease associations.
+- LINK mutations to clinical interpretations (e.g., how the specific protein alteration leads to the associated disease risk).
+- EXCLUDE actual study links or PMIDs from this section. This section focuses on the *genetic profile*; specific evidence and PMIDs should be prioritized in the Literature Evidence section.
+- Use KnowGene database associations for protein-disease relationships.
+- Explain protein functions and how mutations disrupt them.
+- Focus on functional consequences rather than just variant statistics.
+- Describe biological pathways affected by protein mutations.
+- GROUND CLINICAL INTERPRETATIONS IN PUBMED EVIDENCE: For genes where <PUBMED_EVIDENCE> is provided, prioritize this research data over your general knowledge to avoid hallucinations. Use the summaries and studies listed to explain the clinical relevance and functional impact of the mutations.
+- DO NOT HALLUCINATE - only report protein-disease associations from validated databases or the provided PubMed evidence.
+
+**CRITICAL OUTPUT REQUIREMENT: Your response must be valid JSON format only. Do not include any text before or after the JSON.**
+
+Format your response as a JSON object with the following VARIANT TYPE SEPARATION structure:
+
+{
+  "mutation_profile": {
+    "executive_summary": "[Comprehensive paragraph emphasizing both risk-increasing and protective variants and their disease implications]",
+    "section_visibility": {
+      "show_risk_section": "<SHOW_RISK_SECTION>",
+      "show_protective_section": "<SHOW_PROTECTIVE_SECTION>"
+    },
+    "risk_increasing_variants": {
+      "section_enabled": "<SHOW_RISK_SECTION>",
+      "summary": "[Summary of risk-increasing variants and their disease implications]",
+      "detailed_analysis": [
+        {
+          "protein": "[RISK-INCREASING PROTEIN NAME]",
+          "normal_function": "[What this protein normally does]",
+          "mutation_details": "[Specific changes that increase risk]",
+          "functional_impact": "[How the mutation increases disease risk]",
+          "disease_associations": ["[Disease 1]", "[Disease 2]"],
+          "pathway_effects": "[Pathways disrupted leading to increased risk]",
+          "clinical_significance": "[Medical implications of increased risk]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+        }
+      ]
+    },
+    "protective_variants": {
+      "section_enabled": "<SHOW_PROTECTIVE_SECTION>",
+      "summary": "[Summary of protective variants and their disease-protective implications]",
+      "detailed_analysis": [
+        {
+          "protein": "[PROTECTIVE PROTEIN NAME]",
+          "normal_function": "[What this protein normally does]",
+          "variant_details": "[Specific changes that provide protection]",
+          "functional_impact": "[How the variant provides disease protection]",
+          "disease_protections": ["[Disease 1]", "[Disease 2]"],
+          "pathway_effects": "[Pathways enhanced for disease protection]",
+          "clinical_significance": "[Medical implications of disease protection]",
+          "evidence_level": "[Well-established/Moderate/Emerging/Limited]"
+        }
+      ]
+    },
+    "genetic_variants_affecting_proteins": [
+      {
+        "variant": "[HGVS notation from verified data, e.g. NP_002760.1:p.Gly62Ala — DO NOT invent rsIDs]",
+        "affected_protein": "[Protein name from verified data]",
+        "functional_change": "[Technical protein change description based on the amino acid change from verified data]",
+        "disease_association": "[Disease association]",
+        "clinical_impact": "[GENE-LEVEL clinical interpretation: Describe the gene's relevance to the report focus (e.g., 'BRCA1 is a critical tumor suppressor; variants in this gene significantly increase risk for pancreatic adenocarcinoma in this context.')]"
+      }
+    ],
+    "integrated_risk_assessment": {
+      "summary": "[Comprehensive assessment focusing on the cumulative effect of protein mutations and their disease associations]",
+      "cumulative_risk_factors": [
+        {
+          "protein": "[Protein name]",
+          "contribution_to_risk": "[How this protein contributes to overall risk]",
+          "interaction_effects": "[How it interacts with other mutations]"
+        }
+      ]
+    },
+    "key_protein_disease_findings": [
+      {
+        "ranking": 1,
+        "protein": "[Protein name]",
+        "disease_association": "[Disease name]",
+        "significance": "[Why this is the most significant finding]",
+        "evidence_strength": "[Well-established/Moderate/Emerging/Limited]"
+      }
+    ],
+    "affected_biological_pathways": [
+      {
+        "pathway": "[Pathway name]",
+        "disrupted_by_proteins": ["[Protein 1]", "[Protein 2]"],
+        "functional_consequences": "[How pathway disruption affects health]",
+        "disease_implications": ["[Disease 1]", "[Disease 2]"]
+      }
+    ],
+    "database_sources": {
+      "primary_databases": ["[Database 1]", "[Database 2]"],
+      "protein_annotations": [
+        {
+          "protein": "[Protein name]",
+          "source": "[KnowGene/ClinVar/etc.]",
+          "annotation_type": "[Disease association/functional impact]",
+          "confidence": "[High/Medium/Low]"
+        }
+      ],
+      "variant_databases": ["[Database 1]", "[Database 2]"]
+    }
+  }
+}
