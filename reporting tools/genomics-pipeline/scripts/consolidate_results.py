@@ -116,7 +116,8 @@ def main():
 
                     score_line = ent_scores.get(variant_key)
                     if score_line:
-                        f_out.write(f"{score_line}\n")
+                        # Append gene symbol to scored lines for consistent 7-column format
+                        f_out.write(f"{score_line}\t{gene_symbol}\n")
                     else:
                         f_out.write(f"{variant_key}\t{protein_id}\t{p_pos}\t{p_ref}\t{p_alt}\t.\t{gene_symbol}\n")
 

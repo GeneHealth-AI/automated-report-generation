@@ -512,7 +512,7 @@ class Report:
                 position = parts[2]
                 ref_aa = parts[3]
                 alt_aa = parts[4]
-                score = parts[-1]
+                score = parts[5]  # Disease score is always column 6 (index 5)
                 MIN_SCORE = 0.5  # Lowered to match association threshold
                 
                 try:
