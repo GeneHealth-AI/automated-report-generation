@@ -122,10 +122,12 @@ def generate_report(template, vcf_path, annotated_vcf_path, name, patient_id, pr
             raise
         
         # Set up report info from Lambda parameters
+        gender = os.environ.get('PATIENT_GENDER', 'Unknown')
         report_info = {
             "patient_name": name,
             "member_id": patient_id,
-            "provider_name": provider
+            "provider_name": provider,
+            "gender": gender
         }
         
         logger.info(f"Starting report generation for patient: {name}, ID: {patient_id}, Provider: {provider}")
@@ -238,12 +240,7 @@ def generate_report(template, vcf_path, annotated_vcf_path, name, patient_id, pr
             except ImportError:
                 from scripts.visual_html_generator import generate_visual_html
             logger.info("Generating Visual HTML report...")
-            report_info = {
-                "patient_name": name,
-                "member_id": patient_id,
-                "provider_name": provider,
-                "focus": "Precision Genetics" # Default focus
-            }
+            report_info["focus"] = report_info.get("focus", "Precision Genetics")
             html_content = generate_visual_html(blocks, report_info)
             html_file_path = f'/tmp/{patient_id}_Report.html'
             with open(html_file_path, "w") as html_f:
@@ -349,15 +346,52 @@ def main():
         # Download input files from S3
         local_vcf = "/tmp/input.vcf"
         local_annotated = "/tmp/annotated.vcf"
-        
+
         downloads = [
             (vcf_path, local_vcf),
             (annotated_vcf_path, local_annotated)
         ]
-        
+
         for s3_uri, local_path in downloads:
             if not download_s3_file(s3_uri, local_path):
                 raise Exception(f"Failed to download {s3_uri}")
+
+        # Check if the annotated file has usable scores (not all '.')
+        # If not, try to find enterprise_scores.txt in the same S3 directory
+        try:
+            has_scores = False
+            with open(local_annotated, 'r') as f:
+                for i, line in enumerate(f):
+                    if i > 100:
+                        break
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    parts = line.split('\t')
+                    if len(parts) >= 6 and parts[5].strip() not in ('.', '', 'Disease_Score'):
+                        try:
+                            float(parts[5].strip())
+                            has_scores = True
+                            break
+                        except ValueError:
+                            pass
+            if not has_scores:
+                # Try enterprise_scores.txt from the same directory
+                from urllib.parse import urlparse
+                parsed = urlparse(annotated_vcf_path)
+                if parsed.scheme == 's3':
+                    s3_dir = '/'.join(parsed.path.lstrip('/').split('/')[:-1])
+                    scores_uri = f"s3://{parsed.netloc}/{s3_dir}/enterprise_scores.txt"
+                    local_scores = "/tmp/enterprise_scores.txt"
+                    logger.info(f"No scores found in {annotated_vcf_path}, trying {scores_uri}")
+                    if download_s3_file(scores_uri, local_scores):
+                        # Merge: use enterprise_scores.txt as the annotated input
+                        local_annotated = local_scores
+                        logger.info(f"Using enterprise_scores.txt as annotated input (has actual disease scores)")
+                    else:
+                        logger.warning("enterprise_scores.txt not found either — report will have limited genetic data")
+        except Exception as score_check_err:
+            logger.warning(f"Score check failed (non-blocking): {score_check_err}")
         
         # Generate reports
         logger.info("Starting report generation...")

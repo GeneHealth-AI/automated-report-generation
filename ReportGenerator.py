@@ -502,17 +502,29 @@ class Report:
         variants_to_convert = []
         with open(vcf_path,'r') as data:
             for line in data:
+                line = line.strip()
+                if not line or line.startswith('#'):  # Skip empty lines and header
+                    continue
                 parts = [p.strip() for p in line.split('\t')]
                 if len(parts) < 6:  # Need at least variant, protein, position, ref, alt, score
                     continue
-                    
+
                 # Parse the variant tuple - format is like: ('chr15:g.66528912A>G','G')
                 variant_str = parts[0]
                 protein = parts[1].strip()
                 position = parts[2]
                 ref_aa = parts[3]
                 alt_aa = parts[4]
-                score = parts[-1]
+
+                # Score is always at index 5 in both formats:
+                #   Old 6-col: rsID, Protein_ID, Position, Ref_AA, Alt_AA, Score
+                #   New 7-col: rsID, Protein_ID, Position, Ref_AA, Alt_AA, Score, Gene
+                score = parts[5]
+
+                # Skip variants with no disease score
+                if score in ('.', '', 'Disease_Score'):
+                    continue
+
                 MIN_SCORE = 0.5  # Lowered to match association threshold
                 
                 try:
