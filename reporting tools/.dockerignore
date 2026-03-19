@@ -1,0 +1,7 @@
+.git
+.gemini
+output_*
+test_*.fq.gz
+data/
+miniconda3/
+*.log

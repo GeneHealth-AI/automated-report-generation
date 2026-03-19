@@ -1,0 +1,49 @@
+# Use NVIDIA Parabricks as base
+FROM nvcr.io/nvidia/clara/clara-parabricks:4.4.0-1
+
+ENV BASE_DIR="/app"
+WORKDIR /app
+
+# Install dependencies
+# - awscli: for S3 interactions
+# - snpeff: for annotation
+# - python3: for formatting script
+# - wget/unzip: for installing snpeff
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip openjdk-21-jre-headless wget unzip tcsh bwa samtools && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install AWS CLI and Python libraries for Enterprise tools
+RUN pip3 install boto3 openai awscli
+
+# Install SnpEff
+RUN wget -q https://snpeff-public.s3.amazonaws.com/versions/snpEff_latest_core.zip && \
+    unzip -q snpEff_latest_core.zip && \
+    rm snpEff_latest_core.zip && \
+    echo '#!/bin/bash\njava -Xmx8g -jar /app/snpEff/snpEff.jar "$@"' > /usr/local/bin/snpEff && \
+    chmod +x /usr/local/bin/snpEff && \
+    echo '#!/bin/bash\njava -Xmx8g -jar /app/snpEff/SnpSift.jar "$@"' > /usr/local/bin/SnpSift && \
+    chmod +x /usr/local/bin/SnpSift
+
+# Add SnpEff to PATH
+ENV PATH="/app/snpEff:${PATH}"
+
+# Copy pipeline scripts
+COPY pipeline/ /app/pipeline/
+COPY entprise_programs/ /app/entprise_programs/
+
+# Make scripts executable
+RUN chmod +x /app/pipeline/*.sh
+
+# Create data directories
+RUN mkdir -p /app/data/ref
+
+# Legacy Compatibility: Create /home/ec2-user so paths in scripts work
+RUN mkdir -p /home/ec2-user
+
+
+# Entrypoint
+# We use the refactored run_parabricks.sh which handles everything.
+ENTRYPOINT ["/bin/bash", "/app/pipeline/run_parabricks.sh"]

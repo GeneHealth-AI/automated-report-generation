@@ -1,0 +1,16 @@
+lambda/
+infra/
+build_and_push.sh
+.dockerignore
+.git
+*.log
+*.md
+*.zip
+entprise/str_entprise.tar.gz
+entprise/test/
+entprise/__tmp*
+entprise/_tmp*
+entprise/April/
+entpriseX/test/
+entpriseX/__tmp*
+entpriseX/_tmp*
