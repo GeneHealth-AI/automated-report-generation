@@ -43,7 +43,7 @@ PATIENT_ID = "PATIENT_ID"
 PROVIDER_NAME = "PROVIDER_NAME"
 
 # Hard‑coded output destination
-OUTPUT_BUCKET = "ghcompletedreports"
+OUTPUT_BUCKET = "completed-auto-reports"
 
 # GeneHealth API configuration
 GENEHEALTH_API_BASE = "https://www.genehealth.ai/api/amazon"

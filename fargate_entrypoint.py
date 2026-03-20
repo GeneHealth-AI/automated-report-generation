@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger("FargateReportGeneration")
 
 # Default output S3 bucket
-DEFAULT_OUTPUT_BUCKET = "ghcompletedreports"
+DEFAULT_OUTPUT_BUCKET = "completed-auto-reports"
 
 # GeneHealth API configuration
 GENEHEALTH_API_BASE = "https://www.genehealth.ai/api/amazon"
