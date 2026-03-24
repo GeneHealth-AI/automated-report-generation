@@ -310,8 +310,19 @@ def main():
         name = os.environ.get('NAME')
         patient_id = os.environ.get('ID')
         provider = os.environ.get('PROVIDER')
-        output_bucket = os.environ.get('OUTPUT_S3_BUCKET')
+        output_bucket_raw = os.environ.get('OUTPUT_S3_BUCKET', 'completed-auto-reports')
         output_filename = os.environ.get('OUTPUT_FILENAME')
+
+        # Handle bucket paths like "completed-auto-reports/user-reports"
+        # Split into actual bucket name and key prefix
+        if '/' in output_bucket_raw:
+            output_bucket = output_bucket_raw.split('/')[0]
+            output_key_prefix = '/'.join(output_bucket_raw.split('/')[1:]).strip('/')
+            if output_key_prefix:
+                output_key_prefix += '/'
+        else:
+            output_bucket = output_bucket_raw
+            output_key_prefix = ''
         
         # Validate required parameters
         # Either TEMPLATE or TEMPLATE_PATH must be provided
@@ -425,13 +436,13 @@ def main():
                 if output_filename == 'output_filename' or not output_filename or output_filename.startswith('${'):
                     # Generate a proper filename
                     base_name = f"{patient_id}_{name.replace(' ', '_')}_report_{timestamp}"
-                    s3_key = f"{base_name}.{file_extension}"
+                    s3_key = f"{output_key_prefix}{base_name}.{file_extension}"
                 else:
                     # Use provided filename, but ensure it has the right extension
                     if not output_filename.endswith(f'.{file_extension}'):
-                        s3_key = f"{output_filename}.{file_extension}"
+                        s3_key = f"{output_key_prefix}{output_filename}.{file_extension}"
                     else:
-                        s3_key = output_filename
+                        s3_key = f"{output_key_prefix}{output_filename}"
                 if upload_s3_file(file_path, output_bucket, s3_key):
                     uploaded_files.append(f"s3://{output_bucket}/{s3_key}")
                     logger.info(f"Successfully uploaded {file_path} to s3://{output_bucket}/{s3_key}")
