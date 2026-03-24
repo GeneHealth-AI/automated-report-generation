@@ -13,7 +13,6 @@ from mutation_description_generator import MutationDescriptionGenerator
 from Bio import Entrez
 import re
 import requests
-import google.generativeai as genai
 from block_generator import generate_gemini_response, GEMINI_AVAILABLE
 from collections.abc import Iterable
 from token_counter import analyze_block_data

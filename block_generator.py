@@ -41,13 +41,8 @@ def create_anthropic_client_safe(api_key=None, timeout=240.0):
         else:
             raise
 
-try:
-    import google.generativeai as genai
-    from google.api_core import exceptions as google_exceptions
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-    logger.warning("Google Generative AI not available. Install with: pip install google-generativeai")
+# Gemini is no longer used — all LLM calls go through Claude Sonnet 4.6
+GEMINI_AVAILABLE = True  # Kept for backward compatibility checks
 
 BLOCKS_PATH = 'blocks'
 
@@ -116,124 +111,72 @@ BLOCKS_PATH = 'blocks'
             
             # For other errors, or if we've exhausted retries, raise the exception
             raise'''
-def generate_gemini_response(prompt: str, system_prompt: str, max_tokens: int = 256000) -> str:
+def generate_gemini_response(prompt: str, system_prompt: str, max_tokens: int = 128000) -> str:
     """
-    Generate plain text response using the google-generativeai library
-    with retry logic for API errors.
-    
+    Generate a text response using Claude Sonnet 4.6 (Anthropic API).
+    Kept as generate_gemini_response for backward compatibility with all callers.
+
     Args:
         prompt: The user prompt.
         system_prompt: System instructions for the model.
-        max_tokens: Maximum tokens to generate.
-        
+        max_tokens: Maximum tokens to generate (capped at 16384 for Claude).
+
     Returns:
         String containing the text response.
     """
-    logger.info(f"🔧 DEBUG: generate_gemini_response() starting, KEY: {os.environ.get('GEMINI_API_KEY')}")
-    
-    if not GEMINI_AVAILABLE:
-        logger.error("❌ DEBUG: Google Generative AI not available")
-        raise ImportError("Google Generative AI not available. Install with: pip install google-generativeai")
-    
-    try:
-        logger.info("🔧 DEBUG: Getting GEMINI_API_KEY from environment")
-        # Get API key from environment variable and configure the genai library
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            logger.error("❌ DEBUG: GEMINI_API_KEY environment variable not set")
-            raise ValueError("GEMINI_API_KEY environment variable not set")
-        
-        logger.info("🔧 DEBUG: Configuring genai with API key")
-        genai.configure(api_key=api_key)
-        logger.info("✅ DEBUG: genai configured successfully")
-    except Exception as e:
-        logger.error(f"❌ DEBUG: Error in genai configuration: {str(e)}")
-        logger.error(f"❌ DEBUG: genai config traceback: {traceback.format_exc()}")
-        raise
-    
-    try:
-        # Use gemini-3-flash-preview as requested
-        model_name = "gemini-3-flash-preview"
-        logger.info(f"🔧 DEBUG: Creating GenerativeModel instance for {model_name}")
-        
-        # Set up the model configuration
-        model = genai.GenerativeModel(
-            model_name=model_name,
-            system_instruction=system_prompt
-        )
-        logger.info("✅ DEBUG: GenerativeModel created successfully")
-        
-        logger.info("🔧 DEBUG: Creating GenerationConfig")
-        generation_config = genai.types.GenerationConfig(
-            max_output_tokens=max_tokens,
-            temperature=0.1
-        )
-        logger.info("✅ DEBUG: GenerationConfig created successfully")
-    except Exception as e:
-        logger.error(f"❌ DEBUG: Error creating Gemini model/config: {str(e)}")
-        logger.error(f"❌ DEBUG: Model creation traceback: {traceback.format_exc()}")
-        raise
+    # Claude max_tokens cap
+    claude_max_tokens = min(max_tokens, 16384)
 
-    # Retry parameters
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+
+    client = create_anthropic_client_safe(api_key, timeout=240.0)
+
     max_retries = 5
-    retry_delay = 20  # seconds
-    
+    retry_delay = 20
+
     for attempt in range(max_retries):
         try:
-            logger.info(f'🔧 DEBUG: STARTING API call (attempt {attempt + 1}/{max_retries})')
-            
-            # Generate content using the google-generativeai library
-            prompt_size = len(prompt)
-            logger.info(f"🔧 DEBUG: Prompt size: {prompt_size} characters")
-            logger.info("🔧 DEBUG: Calling model.generate_content() with 120s timeout")
-            response = model.generate_content(
-                contents=prompt,
-                generation_config=generation_config,
-                request_options={"timeout": 120}
+            logger.info(f"Claude API call (attempt {attempt + 1}/{max_retries}), prompt: {len(prompt)} chars")
+            response = client.messages.create(
+                model="claude-sonnet-4-6-20250514",
+                max_tokens=claude_max_tokens,
+                temperature=0.1,
+                system=system_prompt,
+                messages=[{"role": "user", "content": prompt}]
             )
-            logger.info("✅ DEBUG: model.generate_content() completed successfully")
-            
-            logger.info('✅ DEBUG: API call successful!')
-            return response.text
-            
-        except (google_exceptions.ResourceExhausted, google_exceptions.ServiceUnavailable, google_exceptions.DeadlineExceeded) as e:
-            # This catches rate limiting (429), server overload (5xx), and timeout (504) errors
-            print(f"API error occurred: {e}")
+            content_text = response.content[0].text
+            logger.info(f"Claude API call successful, response: {len(content_text)} chars")
+            return content_text
+
+        except anthropic.RateLimitError as e:
+            logger.warning(f"Rate limited: {e}")
             if attempt < max_retries - 1:
-                print(f"Retrying in {retry_delay} seconds... (Attempt {attempt + 1}/{max_retries})")
+                logger.info(f"Retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})")
                 time.sleep(retry_delay)
-                retry_delay = min(retry_delay * 1.5, 60)  # Exponential backoff, max 60 seconds
+                retry_delay = min(retry_delay * 2, 120)
                 continue
-            else:
-                print(f"Failed after {max_retries} attempts.")
-                raise
-        except Exception as e:
-            logger.error(f"❌ DEBUG: Exception in generate_gemini_response: {str(e)}")
-            logger.error(f"❌ DEBUG: Exception type: {type(e).__name__}")
-            logger.error(f"❌ DEBUG: Full traceback: {traceback.format_exc()}")
-            
-            # Check if this is the proxies error we're looking for
-            if "proxies" in str(e):
-                logger.error("🚨 DEBUG: FOUND THE PROXIES ERROR! It's coming from generate_gemini_response")
-                logger.error(f"🚨 DEBUG: Proxies error details: {str(e)}")
-                raise
-            
-            # Check if it's a timeout-related error in the error message
-            error_str = str(e).lower()
-            if any(timeout_indicator in error_str for timeout_indicator in ['timeout', 'deadline', '504', 'gateway timeout']):
-                logger.warning(f"⚠️ DEBUG: Timeout error detected: {e}")
+            raise
+
+        except anthropic.APIStatusError as e:
+            if e.status_code == 529 or "overloaded" in str(e).lower():
+                logger.warning(f"API overloaded: {e}")
                 if attempt < max_retries - 1:
-                    logger.info(f"🔄 DEBUG: Retrying in {retry_delay} seconds... (Attempt {attempt + 1}/{max_retries})")
+                    logger.info(f"Retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})")
                     time.sleep(retry_delay)
-                    retry_delay = min(retry_delay * 1.5, 60)  # Exponential backoff
+                    retry_delay = min(retry_delay * 2, 120)
                     continue
-                else:
-                    logger.error(f"❌ DEBUG: Failed after {max_retries} attempts due to timeout.")
-                    raise
-            else:
-                # For other errors, raise the exception immediately
-                logger.error(f"❌ DEBUG: An unexpected error occurred: {e}")
-                raise
+            logger.error(f"Claude API error: {e}")
+            raise
+
+        except Exception as e:
+            logger.error(f"Unexpected error in Claude API call: {type(e).__name__}: {e}")
+            if attempt < max_retries - 1 and any(x in str(e).lower() for x in ['timeout', 'connection']):
+                time.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 120)
+                continue
+            raise
 
 def construct_blocks(blocks_path: str) -> Dict[BlockType, str]:
     """Load block templates from text files."""
