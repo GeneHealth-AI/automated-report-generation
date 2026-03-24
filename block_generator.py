@@ -124,14 +124,14 @@ def generate_gemini_response(prompt: str, system_prompt: str, max_tokens: int = 
     Returns:
         String containing the text response.
     """
-    # Claude Sonnet 4.6 max output: 16384 tokens (standard mode)
-    claude_max_tokens = 16384
+    # Claude Sonnet 4.6 max output: 64000 tokens
+    claude_max_tokens = 64000
 
     api_key = os.environ.get('ANTHROPIC_API_KEY')
     if not api_key:
         raise ValueError("ANTHROPIC_API_KEY environment variable not set")
 
-    client = create_anthropic_client_safe(api_key, timeout=240.0)
+    client = create_anthropic_client_safe(api_key, timeout=600.0)
 
     max_retries = 5
     retry_delay = 20
@@ -140,7 +140,7 @@ def generate_gemini_response(prompt: str, system_prompt: str, max_tokens: int = 
         try:
             logger.info(f"Claude API call (attempt {attempt + 1}/{max_retries}), prompt: {len(prompt)} chars")
             response = client.messages.create(
-                model="claude-sonnet-4-6-20250514",
+                model="claude-sonnet-4-6",
                 max_tokens=claude_max_tokens,
                 temperature=0.1,
                 system=system_prompt,

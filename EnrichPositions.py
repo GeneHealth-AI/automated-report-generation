@@ -3,7 +3,7 @@ import sys
 import json
 import os
 import anthropic
-import google.generativeai as genai
+# LLM calls use Claude via block_generator.generate_gemini_response
 
 def create_anthropic_client_safe(api_key=None, timeout=240.0):
     """Create Anthropic client with proxy error handling."""
@@ -86,28 +86,10 @@ def extract_mutations(vcf_path):
                 
     return list(mutations_formatted)
 
-def create_gemini_model_safe():
-    """
-    Safely creates and configures a Gemini model instance.
-    
-    Retrieves the API key from the environment variable 'GEMINI_API_KEY'.
-    
-    Returns:
-        A GenerativeModel instance or None if the API key is not found.
-    """
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("Error: GEMINI_API_KEY environment variable not set.")
-        return None
-    
-    try:
-        genai.configure(api_key=api_key)
-        # Using gemini-3-flash-preview as it's fast and efficient for classification tasks
-        model = genai.GenerativeModel('gemini-3-flash-preview')
-        return model
-    except Exception as e:
-        print(f"Error configuring Gemini: {e}")
-        return None
+def _call_claude(prompt: str, system_prompt: str = "", max_tokens: int = 1024) -> str:
+    """Call Claude via the shared generate_gemini_response function."""
+    from block_generator import generate_gemini_response
+    return generate_gemini_response(prompt, system_prompt, max_tokens)
 
 def enrich_positions(vcf_path, prompt, batch_size=500, p_value_threshold=0.05):
     """
@@ -151,30 +133,18 @@ def enrich_positions(vcf_path, prompt, batch_size=500, p_value_threshold=0.05):
     if not significant_entries:
         return []
     
-    # 4. Create Gemini model instance
-    model = create_gemini_model_safe()
-    if not model:
-        return [] # Stop if the model couldn't be initialized
-        
-    generation_config = genai.types.GenerationConfig(
-        temperature=0,      # For deterministic, consistent output
-        max_output_tokens=1024 # Set a reasonable limit for the list of numbers
-    )
-    
     relevant_rsIDs = []
-    
-    # 5. Process significant entries in batches using the Gemini API
+
+    system_prompt = "You are a precision medicine and disease expert. Evaluate genetic associations for clinical relevance with extreme precision. Return ONLY numbers or NONE."
+
+    # 4. Process significant entries in batches using Claude
     for i in range(0, len(significant_entries), batch_size):
         batch = significant_entries[i:i+batch_size]
-        
-        # Create a numbered list of diseases for the LLM to evaluate
+
         disease_list = [f"{j+1}. {entry['DISEASE/TRAIT']}" for j, entry in enumerate(batch)]
         diseases_text = "\n".join(disease_list)
-        
-        # This prompt is adapted for Gemini, merging the system and user prompts
-        batch_prompt = f"""You are a precision medicine and disease expert. Your task is to evaluate genetic associations for clinical relevance with extreme precision.
 
-FOCUS TOPIC: {prompt}
+        batch_prompt = f"""FOCUS TOPIC: {prompt}
 
 STRICT CRITERIA FOR INCLUSION:
 - The disease/trait must be DIRECTLY and CLINICALLY related to the focus topic.
@@ -192,14 +162,9 @@ INSTRUCTIONS:
 - If none meet the criteria, return the word "NONE".
 
 Example Format: 1, 3, 7, 12"""
-        
+
         try:
-            response = model.generate_content(
-                batch_prompt,
-                generation_config=generation_config,
-                request_options={"timeout": 600}
-            )
-            response_text = response.text.strip()
+            response_text = _call_claude(batch_prompt, system_prompt, max_tokens=1024).strip()
             
             # 6. Parse the response and collect relevant entries
             if response_text.upper() != "NONE":
