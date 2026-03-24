@@ -124,8 +124,8 @@ def generate_gemini_response(prompt: str, system_prompt: str, max_tokens: int = 
     Returns:
         String containing the text response.
     """
-    # Claude max_tokens cap
-    claude_max_tokens = min(max_tokens, 16384)
+    # Claude Sonnet 4.6 max output: 16384 tokens (standard mode)
+    claude_max_tokens = 16384
 
     api_key = os.environ.get('ANTHROPIC_API_KEY')
     if not api_key:
