@@ -232,7 +232,9 @@ def generate_visual_html(blocks: list[ReportBlock], report_info: dict[str, Any] 
             "provider_name": report_info.get("provider_name", "") if report_info else "",
             "date": datetime.now().strftime("%B %d, %Y"),
             "title": report_info.get("title", report_info.get("focus", "GeneHealth Report")) if report_info else "GeneHealth Report",
-            "focus": report_info.get("focus", "GeneHealth Report") if report_info else "GeneHealth Report"
+            "focus": report_info.get("focus", "GeneHealth Report") if report_info else "GeneHealth Report",
+            "dashboard_url": report_info.get("dashboard_url", "https://www.genehealth.ai/dashboard") if report_info else "#",
+            "reports_url": report_info.get("reports_url", "https://www.genehealth.ai/reports") if report_info else "#"
         }
         
         report_title = f"{metadata['title']} | {metadata['patient_name']}"
@@ -966,9 +968,9 @@ def generate_visual_html(blocks: list[ReportBlock], report_info: dict[str, Any] 
         <main class="main-content">
             <header class="page-header">
                 <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb navigation">
-                    <a href="#">Dashboard</a>
+                    <a href="{{ metadata.dashboard_url }}">Dashboard</a>
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                    <a href="#">Reports</a>
+                    <a href="{{ metadata.reports_url }}">Reports</a>
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     <span aria-current="page">{{ metadata.title }}</span>
                 </nav>
