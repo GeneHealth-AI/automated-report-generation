@@ -123,11 +123,16 @@ def generate_report(template, vcf_path, annotated_vcf_path, name, patient_id, pr
         
         # Set up report info from Lambda parameters
         gender = os.environ.get('PATIENT_GENDER', 'Unknown')
+        # Extract title/focus from the template data
+        report_title = template_data.get('name', template_data.get('focus', 'Genetic Health Report'))
+        report_focus = template_data.get('focus', report_title)
         report_info = {
             "patient_name": name,
             "member_id": patient_id,
             "provider_name": provider,
-            "gender": gender
+            "gender": gender,
+            "title": report_title,
+            "focus": report_focus
         }
         
         logger.info(f"Starting report generation for patient: {name}, ID: {patient_id}, Provider: {provider}")
@@ -240,7 +245,6 @@ def generate_report(template, vcf_path, annotated_vcf_path, name, patient_id, pr
             except ImportError:
                 from scripts.visual_html_generator import generate_visual_html
             logger.info("Generating Visual HTML report...")
-            report_info["focus"] = report_info.get("focus", "Precision Genetics")
             html_content = generate_visual_html(blocks, report_info)
             html_file_path = f'/tmp/{patient_id}_Report.html'
             with open(html_file_path, "w") as html_f:

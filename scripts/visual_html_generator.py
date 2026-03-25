@@ -945,15 +945,21 @@ def generate_visual_html(blocks: list[ReportBlock], report_info: dict[str, Any] 
                     {% endfor %}
                 </div>
 
+                {% set additional_blocks = [] %}
+                {% for block in sorted_blocks if block.block_type.value in ['research_opportunities', 'gwas_analysis', 'conclusion'] %}
+                    {% if additional_blocks.append(block) %}{% endif %}
+                {% endfor %}
+                {% if additional_blocks %}
                 <div class="nav-category">
                     <div class="category-title">Additional</div>
-                    {% for block in sorted_blocks if block.block_type.value in ['research_opportunities', 'gwas_analysis', 'conclusion'] %}
+                    {% for block in additional_blocks %}
                     <a href="#section-{{ block.block_type.value }}" class="nav-link">
                         <i class="fas fa-{{ 'flask' if block.block_type.value == 'research_opportunities' else 'chart-bar' if block.block_type.value == 'gwas_analysis' else 'flag-checkered' }}"></i>
                         {{ block.title }}
                     </a>
                     {% endfor %}
                 </div>
+                {% endif %}
             </nav>
         </aside>
 
@@ -999,6 +1005,12 @@ def generate_visual_html(blocks: list[ReportBlock], report_info: dict[str, Any] 
                                 <span class="info-label">Patient ID</span>
                                 <span class="info-value">{{ metadata.patient_id or 'Not Provided' }}</span>
                             </div>
+                            {% if metadata.provider_name %}
+                            <div class="info-item">
+                                <span class="info-label">Provider</span>
+                                <span class="info-value">{{ metadata.provider_name }}</span>
+                            </div>
+                            {% endif %}
 
                         </div>
                     </div>
